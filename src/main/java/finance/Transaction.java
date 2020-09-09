@@ -3,40 +3,63 @@ package finance;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+
 /**
- * Creates a transaction object that contains the amount and date
+ * Creates a transaction object that contains the value and date
  * @author Dylan Munro
  */
 public class Transaction {
     
-    private double amount;
+    private double value;
     private Date date;
     
     /**
      * Constructor for the Transaction class
      * By default, the date of the transaction is the current date
-     * @param amount The cost of the transaction
+     * @param value The cost of the transaction
      */
-    public Transaction(double amount) {
-        this(amount, new Date()); //Default date is current date
+    public Transaction(double value) {
+        this(value, new Date()); //Default date is current date
     }
     
     /**
      * Constructor for the transaction class
-     * @param amount The cost of the transaction
+     * @param value The cost of the transaction
      * @param date The date of the transaction
      */
-    public Transaction(double amount, Date date) {
-        this.amount = amount;
+    public Transaction(double value, Date date) {
+        this.value = value;
         this.date = date;
+    }
+    
+    /**
+     * Constructor
+     * @param obj JSONObject representation of the transaction to be added
+     */
+    public Transaction(JSONObject obj) throws CorruptJSONObjectException {
+        
+        //process the value of transaction
+        if (obj.get("value") == null) {
+            throw new CorruptJSONObjectException("Transaction does not have a value");
+        }
+        this.value = Double.parseDouble(obj.get("value").toString());
+        
+        //process the date of transaction
+        if (obj.get("date") == null) {
+            this.date = new Date();
+        } else {
+            this.date = new Date((String) obj.get("date"));
+        }
     }
     
     /**
      * Returns the cost of the transaction
      * @return The cost of the transaction
      */
-    public double getAmount() {
-        return amount;
+    public double getValue() {
+        return value;
     }
     
     /**
@@ -53,7 +76,7 @@ public class Transaction {
      */
     @Override
     public String toString() {
-        return amount + new SimpleDateFormat("yyyy-MM-dd").format(date);
+        return value + new SimpleDateFormat("yyyy-MM-dd").format(date);
     }
     
 }

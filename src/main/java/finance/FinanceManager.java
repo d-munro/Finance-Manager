@@ -92,26 +92,9 @@ public class FinanceManager {
     }
 
     /**
-     * Opens the JSON file containing details about the accounts
-     *
-     * @param filePath The path to the JSON file
+     * Loads all preliminary data needed to execute program
      */
-    private JSONObject loadAccountsJSON(BufferedReader inputStream) {
-        JSONObject accountsJSON = null;
-        JSONParser parser = new JSONParser();
-        try {
-            accountsJSON = (JSONObject) parser.parse(inputStream);
-        } catch (ParseException | IOException e) {
-            System.out.println(e.getMessage());
-        }
-        return accountsJSON;
-    }
-
-    /**
-     * Main method to handle program execution
-     */
-    private void load() {
-        Scanner input = new Scanner(System.in);
+    private void load(Scanner input) {
         try {
             loadFiles(input);
         } catch (IOException | CorruptJSONObjectException e) {
@@ -125,6 +108,22 @@ public class FinanceManager {
             accounts.add(createAccount(input));
         }
 
+    }
+
+    /**
+     * Opens the JSON file containing details about the accounts
+     *
+     * @param filePath The path to the JSON file
+     */
+    private JSONObject loadAccountsJSON(BufferedReader inputStream) {
+        JSONObject accountsJSON = null;
+        JSONParser parser = new JSONParser();
+        try {
+            accountsJSON = (JSONObject) parser.parse(inputStream);
+        } catch (ParseException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return accountsJSON;
     }
 
     /**
@@ -175,7 +174,26 @@ public class FinanceManager {
      */
     public static void main(String[] args) {
         FinanceManager manager = new FinanceManager();
-        manager.load();
+        Scanner input = new Scanner(System.in);
+        manager.load(input);
+        manager.run(input);
     }
 
+    /**
+     * Main method used for running the program
+     * 
+     * @param input The Scanner which input is being read from
+     */
+    private void run(Scanner input) {
+        String userChoice = "";
+        Request currentRequest;
+        System.out.println("To view a list of all options, type \"help\"");
+        while (userChoice.compareToIgnoreCase("quit") != 0) {
+            try {
+                currentRequest = new Request(input.nextLine()); 
+            } catch (InvalidInputException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
 }

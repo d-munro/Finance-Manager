@@ -35,28 +35,18 @@ public class FinanceManager {
     }
 
     /**
-     * Returns the path to the JSON file containing details about the accounts
-     * No error is thrown if the file path is invalid
-     *
-     * @param input The Scanner which input is being read from
-     * @return The path to the JSON file
-     */
-    public String getFilePath(Scanner input) {
-        System.out.println("Enter the path to the file with the account details");
-        return input.nextLine();
-    }
-
-    /**
      * Loads all account information from a file
      *
      * @param input The Scanner which input is being read from
+     * @return The stream containing account details
      */
-    public BufferedReader getFileStream(Scanner input) {
+    public BufferedReader getAccountFilePath(Scanner input) {
         BufferedReader fileStream = null;
         boolean isValidFile = false;
         while (!isValidFile) {
             try {
-                fileStream = new BufferedReader(new FileReader(getFilePath(input)));
+                System.out.println("Enter the path to the file with the account details");
+                fileStream = new BufferedReader(new FileReader(input.nextLine()));
                 isValidFile = true;
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -133,7 +123,7 @@ public class FinanceManager {
         String userResponse = getYesOrNoResponse(
                 "Would you like to load a file with account details? (Yes/No)", input);
         if (userResponse.compareToIgnoreCase("Yes") == 0) {
-            accountsJson = loadAccountsJSON(getFileStream(input));
+            accountsJson = loadAccountsJSON(getAccountFilePath(input));
         }
     }
 

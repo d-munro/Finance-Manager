@@ -1,13 +1,20 @@
 //TODO create ability to load accounts from JSON file
-
 package finance;
 
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.LinkedList;
+import org.json.simple.parser.ParseException;
 
 /**
  * Handles all input and output for the finance package
+ *
  * @author Dylan Munro
  */
 public class FinanceManager {
@@ -25,6 +32,37 @@ public class FinanceManager {
         if (userInput.compareToIgnoreCase("Yes") == 0) {
             accounts.add(initializeAccountDetails(input));
         }
+    }
+
+    /**
+     * Returns the path to the JSON file containing details about the accounts
+     * No error is thrown if the file path is invalid
+     *
+     * @param input The Scanner which input is being read from
+     * @return The path to the JSON file
+     */
+    public String getFilePath(Scanner input) {
+        System.out.println("Enter the path to the file with the account details");
+        return input.nextLine();
+    }
+
+    /**
+     * Loads all account information from a file
+     *
+     * @param input The Scanner which input is being read from
+     */
+    public BufferedReader getFileStream(Scanner input) {
+        BufferedReader fileStream = null;
+        boolean isValidFile = false;
+        while (!isValidFile) {
+            try {
+                fileStream = new BufferedReader(new FileReader(getFilePath(input)));
+                isValidFile = true;
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return fileStream;
     }
 
     /**
@@ -75,19 +113,47 @@ public class FinanceManager {
     }
 
     /**
+     * Opens the JSON file containing details about the accounts
+     *
+     * @param filePath The path to the JSON file
+     */
+    private JSONObject loadAccountsJSON(BufferedReader inputStream) {
+        JSONObject accountsJSON = null;
+        JSONParser parser = new JSONParser();
+        try {
+            accountsJSON = (JSONObject) parser.parse(inputStream);
+        } catch (ParseException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return accountsJSON;
+    }
+
+    private void loadFiles(Scanner input) {
+        JSONObject accountsJson = null;
+        String userResponse = getYesOrNoResponse(
+                "Would you like to load a file with account details? (Yes/No)", input);
+        if (userResponse.compareToIgnoreCase("Yes") == 0) {
+            accountsJson = loadAccountsJSON(getFileStream(input));
+        }
+    }
+
+    /**
+     * Initial method called
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         FinanceManager manager = new FinanceManager();
-        manager.run();
+        manager.load();
     }
 
     /**
      * Main method to handle program execution
      */
-    public void run() {
+    public void load() {
+        JSONArray accountsJSON;
         Scanner input = new Scanner(System.in);
-        //loadAccounts(input);
+        loadFiles(input);
         createAccount(input);
     }
 }

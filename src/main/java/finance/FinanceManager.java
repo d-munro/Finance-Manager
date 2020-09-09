@@ -24,6 +24,7 @@ public class FinanceManager {
 
     /**
      * Creates a new account if desired
+     *
      * @return The account created
      * @param input The Scanner reading the user's input
      */
@@ -36,6 +37,7 @@ public class FinanceManager {
 
     /**
      * Obtains the path from the user to the JSON file with account details
+     *
      * @param input The Scanner which input is being read from
      * @return The stream containing account details
      */
@@ -56,6 +58,7 @@ public class FinanceManager {
 
     /**
      * Obtains a yes or no response from the user to a question
+     *
      * @param question The question being asked
      * @param input The Scanner which input is being read from
      * @return The user's response to the question (yes or no)
@@ -90,6 +93,7 @@ public class FinanceManager {
 
     /**
      * Opens the JSON file containing details about the accounts
+     *
      * @param filePath The path to the JSON file
      */
     private JSONObject loadAccountsJSON(BufferedReader inputStream) {
@@ -107,57 +111,71 @@ public class FinanceManager {
      * Main method to handle program execution
      */
     private void load() {
-        JSONArray accountsJSON;
         Scanner input = new Scanner(System.in);
-        loadFiles(input);
-        
+        try {
+            loadFiles(input);
+        } catch (IOException | CorruptJSONObjectException e) {
+            System.out.println(e.getMessage());
+        }
+
         //create an account
         String userInput = getYesOrNoResponse(
                 "Would you like to create a new account? (Yes/No)", input);
         if (userInput.compareToIgnoreCase("Yes") == 0) {
             accounts.add(createAccount(input));
         }
-        
+
     }
-    
+
     /**
      * Creates various accounts from a JSONObject
+     *
      * @param obj JSONObject containing various details about an account
+     * @throws CorruptJSONObjectException
      */
-    private void loadAccountDetails(JSONObject obj) throws CorruptJSONObjectException {
+    private void loadAccountDetails(JSONObject obj) throws
+            CorruptJSONObjectException {
         JSONArray accountsArray = (JSONArray) obj.get("accounts");
         for (int i = 0; i < accountsArray.size(); i++) {
-            Account acc = new Account((JSONObject) accountsArray.get(i));
             accounts.add(new Account((JSONObject) accountsArray.get(i)));
-            System.out.println(acc);
         }
     }
 
     /**
      * Loads all files needed to execute the program
+     *
      * @param input The Scanner which input is being read from
+     * @throws CorruptJSONObjectException, IOException
      */
-    private void loadFiles(Scanner input) {
+    private void loadFiles(Scanner input) throws CorruptJSONObjectException,
+            IOException {
         JSONObject accountsJson = null;
+        BufferedReader activeStream = null;
         String userResponse = getYesOrNoResponse(
                 "Would you like to load a file with account details? (Yes/No)", input);
         if (userResponse.compareToIgnoreCase("Yes") == 0) {
             try {
-                accountsJson = loadAccountsJSON(getAccountFilePath(input));
-                loadAccountDetails(accountsJson);               
+                activeStream = getAccountFilePath(input);
+                accountsJson = loadAccountsJSON(activeStream);
+                loadAccountDetails(accountsJson);
             } catch (CorruptJSONObjectException e) {
                 System.out.println(e.getMessage());
+            } finally {
+                if (activeStream != null) {
+                    activeStream.close();
+                }
             }
         }
     }
 
     /**
      * Initial method called
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         FinanceManager manager = new FinanceManager();
         manager.load();
     }
-    
+
 }

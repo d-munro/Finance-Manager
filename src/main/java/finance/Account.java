@@ -1,5 +1,6 @@
 package finance;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -14,9 +15,22 @@ import org.json.simple.JSONArray;
  */
 public class Account {
 
+    //constants
     private final String name;
+    private static final HashMap<Integer, Boolean> VALID_SORTING_METHODS;
+    private static final int SORTED_CHRONOLOGICALLY = 1;
+    
+    private String sortingMethod;
     private LinkedList<Transaction> transactions = new LinkedList<>();
 
+    //initialization of VALID_SORTING_METHODS
+    static {
+        VALID_SORTING_METHODS = new HashMap<Integer, Boolean>();
+        VALID_SORTING_METHODS.put(SORTED_CHRONOLOGICALLY, true);
+        VALID_SORTING_METHODS.put(SORTED_CHRONOLOGICALLY, true);
+        VALID_SORTING_METHODS.put(SORTED_CHRONOLOGICALLY, true);
+    }
+    
     /**
      * Constructor for the Account class
      *
@@ -38,7 +52,7 @@ public class Account {
     }
 
     /**
-     * Adds a transaction to the account
+     * Adds a transaction to the account in chronological order
      *
      * @param transaction The transaction to be added
      */
@@ -85,5 +99,24 @@ public class Account {
             returnedString.append(iterator.next()).append("\n");
         }
         return returnedString.toString();
+    }
+    
+    /**
+     * Sorts all transactions in the account in chronological order
+     */
+    public void sortChronologically() {
+        
+    }
+    
+    public void sortByCategory() {
+        
+    }
+    
+    public void sortByCost() {
+        
+    }
+    
+    public void setSortingMethod(String method) {
+        
     }
 }

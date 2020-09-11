@@ -21,6 +21,8 @@ public class Request {
         VALID_REQUESTS.put("history", true);
         VALID_REQUESTS.put("sort", true);
         VALID_REQUESTS.put("search", true); //search for new account
+        VALID_REQUESTS.put("create", true);
+        VALID_REQUESTS.put("delete", true);
     }
     
     /**

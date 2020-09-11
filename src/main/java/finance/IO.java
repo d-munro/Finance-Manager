@@ -1,5 +1,4 @@
 /*------------------------TODO---------------------------
-Display menu of all namesToAccounts and allow user to select one
 Display a meaningful message if user enters an invalid filepath
     (No valid json file is present at location)
 Don't put account prompting in load
@@ -105,14 +104,6 @@ public class IO {
             System.out.println(e.getMessage());
         }
 
-        //create an account
-        Account newAccount;
-        String userInput = getYesOrNoResponse(
-                "Would you like to create a new account? (Yes/No)", input);
-        if (userInput.compareToIgnoreCase("Yes") == 0) {
-            createAccount(input);
-        }
-
     }
 
     /**
@@ -132,21 +123,6 @@ public class IO {
     }
 
     /**
-     * Creates various namesToAccounts from a JSONObject
-     *
-     * @param obj JSONObject containing various details about an account
-     * @throws CorruptJSONObjectException
-     */
-    private void loadAccountDetails(JSONObject obj) throws
-            CorruptJSONObjectException {
-        Account newAccount;
-        JSONArray accountsArray = (JSONArray) obj.get("accounts");
-        for (int i = 0; i < accountsArray.size(); i++) {
-            manager.addAccount(new Account((JSONObject) accountsArray.get(i)));
-        }
-    }
-
-    /**
      * Loads all files needed to execute the program
      *
      * @param input The Scanner which input is being read from
@@ -162,7 +138,7 @@ public class IO {
             try {
                 activeStream = getAccountFilePath(input);
                 accountsJson = loadAccountsJSON(activeStream);
-                loadAccountDetails(accountsJson);
+                manager.generateAccounts(accountsJson);
             } catch (CorruptJSONObjectException e) {
                 System.out.println(e.getMessage());
             } finally {
@@ -192,7 +168,6 @@ public class IO {
      */
     private void run(Scanner input) {
         String userChoice = "";
-        AccountManager manager = new AccountManager();
         Request currentRequest;
         System.out.println("To view a list of all options, type \"help\"");
         while (userChoice.compareToIgnoreCase("quit") != 0) {
@@ -205,7 +180,6 @@ public class IO {
         }
     }
 
-    //TODO display all accounts, prompt user to select one, change 
     public void selectAccount(Scanner input) throws AccountNotFoundException {
         System.out.println("The accounts currently loaded are:");
         for (String current : manager.getAccountNames()) {

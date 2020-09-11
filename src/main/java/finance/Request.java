@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package finance;
 
 //imports
@@ -52,6 +47,7 @@ public class Request {
     
     /**
      * Returns the action of the user's command
+     * The action describes the intention of the user's request
      * 
      * @return The action of the command
      */

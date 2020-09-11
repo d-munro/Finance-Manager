@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 
 /**
- * Creates a transaction object that contains the value and date
+ * Creates a Transaction object which describes changes in an Account's value
  *
  * @author Dylan Munro
  */
@@ -19,10 +19,11 @@ public class Transaction {
     private Date date;
 
     /**
-     * Constructor for the Transaction class By default, the date of the
-     * transaction is the current date
+     * Constructor for the Transaction class
+     * By default, the date of the transaction is the current date
      *
-     * @param item The item involved in the transaction
+     * @param item The physical object which caused the transaction
+     * to take place
      */
     public Transaction(Item item) {
         this(item, new Date()); //Default date is current date
@@ -31,8 +32,9 @@ public class Transaction {
     /**
      * Constructor for the transaction class
      *
-     * @param item The item involved in the transaction
-     * @param date The date of the transaction
+     * @param item The physical object which caused the transaction
+     * to take place
+     * @param date Describes when the transaction occurred
      */
     public Transaction(Item item, Date date) {
         this.item = item;
@@ -62,7 +64,8 @@ public class Transaction {
     }
 
     /**
-     * Returns the item involved in the transaction
+     * The item describes the physical object which caused the transaction
+     * to take place.
      *
      * @return The item involved in the transaction
      */
@@ -71,7 +74,8 @@ public class Transaction {
     }
 
     /**
-     * Returns the date of the transaction
+     * The date describes when the transaction was created.
+     * It is in the format year-month-day.
      *
      * @return The date of the transaction
      */
@@ -80,9 +84,7 @@ public class Transaction {
     }
 
     /**
-     * Returns the cost and date of the transaction
-     *
-     * @return The cost and date of the transaction
+     * @return The cost and date of the transaction formatted as a string
      */
     @Override
     public String toString() {

@@ -2,8 +2,7 @@
 Display menu of all accounts and allow user to select one
 Display a meaningful message if user enters an invalid filepath
     (No valid json file is present at location)
-*/
-
+ */
 package finance;
 
 //imports
@@ -45,14 +44,14 @@ public class FinanceManager {
      * Obtains the path from the user to the JSON file with account details
      *
      * @param input The Scanner which input is being read from
-     * @return The stream containing account details
+     * @return The path to the JSON file with account details
      */
     private BufferedReader getAccountFilePath(Scanner input) {
         BufferedReader fileStream = null;
         boolean isValidFile = false;
         while (!isValidFile) {
+            System.out.println("Enter the path to the file with the account details");
             try {
-                System.out.println("Enter the path to the file with the account details");
                 fileStream = new BufferedReader(new FileReader(input.nextLine()));
                 isValidFile = true;
             } catch (IOException e) {
@@ -187,7 +186,7 @@ public class FinanceManager {
 
     /**
      * Main method used for running the program
-     * 
+     *
      * @param input The Scanner which input is being read from
      */
     private void run(Scanner input) {
@@ -196,20 +195,19 @@ public class FinanceManager {
         System.out.println("To view a list of all options, type \"help\"");
         while (userChoice.compareToIgnoreCase("quit") != 0) {
             try {
-                currentRequest = new Request(input.nextLine()); 
+                currentRequest = new Request(input.nextLine());
             } catch (InvalidInputException e) {
                 System.out.println(e.getMessage());
             }
         }
     }
-    
+
     //TODO display all accounts, prompt user to select one
     /*public void selectAccount() {
         for (Account current : accounts) {
             System.out.println(current.getName());
         }
     }*/
-    
     public void setActiveAccount(Account activeAccount) {
         this.activeAccount = activeAccount;
     }

@@ -1,4 +1,9 @@
-//TODO create ability to load accounts from JSON file
+/*------------------------TODO---------------------------
+Display menu of all accounts and allow user to select one
+Display a meaningful message if user enters an invalid filepath
+    (No valid json file is present at location)
+*/
+
 package finance;
 
 //imports
@@ -21,6 +26,7 @@ import java.util.LinkedList;
 public class FinanceManager {
 
     private LinkedList<Account> accounts = new LinkedList<>();
+    private Account activeAccount;
 
     /**
      * Creates a new account if desired
@@ -148,7 +154,7 @@ public class FinanceManager {
      */
     private void loadFiles(Scanner input) throws CorruptJSONObjectException,
             IOException {
-        JSONObject accountsJson = null;
+        JSONObject accountsJson;
         BufferedReader activeStream = null;
         String userResponse = getYesOrNoResponse(
                 "Would you like to load a file with account details? (Yes/No)", input);
@@ -195,5 +201,16 @@ public class FinanceManager {
                 System.out.println(e.getMessage());
             }
         }
+    }
+    
+    //TODO display all accounts, prompt user to select one
+    /*public void selectAccount() {
+        for (Account current : accounts) {
+            System.out.println(current.getName());
+        }
+    }*/
+    
+    public void setActiveAccount(Account activeAccount) {
+        this.activeAccount = activeAccount;
     }
 }

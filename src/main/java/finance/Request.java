@@ -23,6 +23,9 @@ public class Request {
         VALID_REQUESTS = new HashMap<String, Boolean>();
         VALID_REQUESTS.put("help", true);
         VALID_REQUESTS.put("account", true);
+        VALID_REQUESTS.put("history", true);
+        VALID_REQUESTS.put("sort", true);
+        VALID_REQUESTS.put("search", true); //search for new account
     }
     
     /**

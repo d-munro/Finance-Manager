@@ -1,3 +1,4 @@
+//TODO move the value (cost) of item to the Item class
 package finance;
 
 import java.text.SimpleDateFormat;
@@ -8,44 +9,50 @@ import org.json.simple.JSONArray;
 
 /**
  * Creates a transaction object that contains the value and date
+ *
  * @author Dylan Munro
  */
 public class Transaction {
-    
-    private double value;
+
+    private Item item;
+    private double quantity;
     private Date date;
-    
+
     /**
-     * Constructor for the Transaction class
-     * By default, the date of the transaction is the current date
-     * @param value The cost of the transaction
+     * Constructor for the Transaction class By default, the date of the
+     * transaction is the current date
+     *
+     * @param item The item involved in the transaction
      */
-    public Transaction(double value) {
-        this(value, new Date()); //Default date is current date
+    public Transaction(Item item) {
+        this(item, new Date()); //Default date is current date
     }
-    
+
     /**
      * Constructor for the transaction class
-     * @param value The cost of the transaction
+     *
+     * @param item The item involved in the transaction
      * @param date The date of the transaction
      */
-    public Transaction(double value, Date date) {
-        this.value = value;
+    public Transaction(Item item, Date date) {
+        this.item = item;
         this.date = date;
     }
-    
+
     /**
      * Constructor
+     *
      * @param obj JSONObject representation of the transaction to be added
+     * @throws CorruptJSONObjectException
      */
     public Transaction(JSONObject obj) throws CorruptJSONObjectException {
-        
+
         //process the value of transaction
-        if (obj.get("value") == null) {
-            throw new CorruptJSONObjectException("Transaction does not have a value");
+        if (obj.get("item") == null) {
+            throw new CorruptJSONObjectException("Transaction does not have an item");
         }
-        this.value = Double.parseDouble(obj.get("value").toString());
-        
+        this.item = new Item((JSONObject) obj.get("item"));
+
         //process the date of transaction
         if (obj.get("date") == null) {
             this.date = new Date();
@@ -53,30 +60,33 @@ public class Transaction {
             this.date = new Date((String) obj.get("date"));
         }
     }
-    
+
     /**
-     * Returns the cost of the transaction
-     * @return The cost of the transaction
+     * Returns the item involved in the transaction
+     *
+     * @return The item involved in the transaction
      */
-    public double getValue() {
-        return value;
+    public Item getItem() {
+        return item;
     }
-    
+
     /**
      * Returns the date of the transaction
+     *
      * @return The date of the transaction
      */
     public Date getDate() {
         return date;
     }
-    
+
     /**
      * Returns the cost and date of the transaction
+     *
      * @return The cost and date of the transaction
      */
     @Override
     public String toString() {
-        return value + new SimpleDateFormat("yyyy-MM-dd").format(date);
+        return item + new SimpleDateFormat("yyyy-MM-dd").format(date);
     }
-    
+
 }

@@ -1,6 +1,6 @@
+//TODO implement ability to sort transactions chronologically, by category, by cost
 package finance;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -17,19 +17,12 @@ public class Account {
 
     //constants
     private final String name;
-    private static final HashMap<Integer, Boolean> VALID_SORTING_METHODS;
     private static final int SORTED_CHRONOLOGICALLY = 1;
+    private static final int SORTED_BY_COST = 2;
+    private static final int SORTED_BY_CATEGORY = 3;
     
-    private String sortingMethod;
+    private int sortingMethod;
     private LinkedList<Transaction> transactions = new LinkedList<>();
-
-    //initialization of VALID_SORTING_METHODS
-    static {
-        VALID_SORTING_METHODS = new HashMap<Integer, Boolean>();
-        VALID_SORTING_METHODS.put(SORTED_CHRONOLOGICALLY, true);
-        VALID_SORTING_METHODS.put(SORTED_CHRONOLOGICALLY, true);
-        VALID_SORTING_METHODS.put(SORTED_CHRONOLOGICALLY, true);
-    }
     
     /**
      * Constructor for the Account class
@@ -68,6 +61,15 @@ public class Account {
     public LinkedList<Transaction> getTransactions() {
         return transactions;
     }
+    
+    /**
+     * Returns the name of account
+     * 
+     * @return The name of the account
+     */
+    public String getName() {
+        return name;
+    }
 
     /**
      * Initializes all transactions for the account given a JSONObject of the
@@ -104,19 +106,29 @@ public class Account {
     /**
      * Sorts all transactions in the account in chronological order
      */
-    public void sortChronologically() {
+    private void sortChronologically() {
         
     }
     
-    public void sortByCategory() {
+    private void sortByCategory() {
         
     }
     
-    public void sortByCost() {
+    private void sortByCost() {
         
     }
     
-    public void setSortingMethod(String method) {
-        
+    public void setSortingMethod(int method) {
+        switch (method) {
+            case SORTED_CHRONOLOGICALLY:
+                sortChronologically();
+                sortingMethod = SORTED_CHRONOLOGICALLY;
+            case SORTED_BY_CATEGORY:
+                sortByCategory();
+                sortingMethod = SORTED_BY_CATEGORY;
+            case SORTED_BY_COST:
+                sortByCost();
+                sortingMethod = SORTED_BY_COST;
+        }
     }
 }

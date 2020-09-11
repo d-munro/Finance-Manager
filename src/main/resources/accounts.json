@@ -4,12 +4,26 @@
             "name": "Dylan",
             "transactions": [
                 {
+                    "item": {
+                        "name": "Bicycle",
+                        "fee": 1500.00,
+                        "category": "Health/Fitness"
+                    },
                     "date": "January 1, 2000",
-                    "value": 1500.00                
+                    "quantity": 1
                 },
                 {
-                    "date": "February 23, 2000",
-                    "value": -499.99
+                    "item": {
+                        "name": "Gears",
+                        "fee": -499.99
+                    },
+                    "date": "February 23, 2000"
+                },
+                {
+                    "item": {
+                        "name": "Cake",
+                        "fee": 19.99
+                    }
                 }
             ]
         }

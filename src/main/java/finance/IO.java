@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.ArrayList;
 
 /**
  * Handles all input and output for the finance package
@@ -23,7 +24,7 @@ import java.util.Scanner;
  * @author Dylan Munro
  */
 public class IO {
-    
+
     private AccountManager manager = new AccountManager();
 
     /**
@@ -31,11 +32,25 @@ public class IO {
      *
      * @param input The Scanner reading the user's input
      */
-    public void createAccount(Scanner input) {
+    /*public void createAccount(Scanner input) {
         String name;
         System.out.println("Enter the name of the account");
         name = input.nextLine();
         manager.addAccount(new Account(name));
+    }*/
+
+    /**
+     * Displays all options that a user can choose to display info
+     */
+    public void displayOptions() {
+        System.out.println("Type create to make a new account");
+        System.out.println("Type delete to delete an account");
+        System.out.println("Type history to display all previous transactions"
+                + " for the current account");
+        System.out.println("Type open to open a new account");
+        System.out.println("Type quit to terminate the program");
+        System.out.println("Type sort to sort account transactions");
+        System.out.println("Type display accounts to display all accounts loaded");
     }
 
     /**
@@ -57,6 +72,50 @@ public class IO {
             }
         }
         return fileStream;
+    }
+    
+    /**
+     * Obtains all necessary user input to create a request object for an account
+     * 
+     * @param requestChoice The user's decision as to what to do next
+     * @param input The Scanner which user input is being read from
+     * @return String containing necessary parameters to initialize a request object
+     */
+    private String getAccountRequestParameters(String requestChoice, Scanner input) {
+        String params = null;
+        switch (requestChoice){ //Handles cases where multiple parameters are needed
+            case "create":
+                System.out.println("Enter the name of the account:");
+                params = input.nextLine();
+                break;
+            /*case "display accounts":
+                System.out.println("");
+                break;*/
+            case "delete":
+                System.out.println("Enter the name of the account to delete:");
+                params = input.nextLine();
+                break;
+            /*case "history":
+                System.out.println("");
+                break;*/
+            case "open":
+                System.out.println("Enter the name of the account to open");
+                params = input.nextLine();
+                break;
+            /*case "quit":
+                System.out.println("");
+                break;*/
+            case "sort":
+                System.out.println("Enter chronologically to sort the "
+                        + "transactions chronologically");
+                System.out.println("Enter cost to sort the "
+                        + "transactions by cost");
+                System.out.println("Enter category to sort the "
+                        + "transactions by category");
+                params = input.nextLine();
+                break;
+        }               
+        return params;
     }
 
     /**
@@ -171,9 +230,12 @@ public class IO {
         Request currentRequest;
         System.out.println("To view a list of all options, type \"help\"");
         while (userChoice.compareToIgnoreCase("quit") != 0) {
+            System.out.println("What would you like to do?");
+            displayOptions();
+            userChoice = input.nextLine();
             try {
-                currentRequest = new Request(input.nextLine());
-                manager.executeRequest(currentRequest);
+                currentRequest = new Request(userChoice, getAccountRequestParameters(userChoice, input));
+                //manager.executeRequest(currentRequest);
             } catch (InvalidInputException e) {
                 System.out.println(e.getMessage());
             }

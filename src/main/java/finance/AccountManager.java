@@ -1,7 +1,7 @@
 /*--------------------------------TODO---------------------
 Create methods for processing all requests (help, account, history, sort, search,
 create, delete)
-*/
+ */
 package finance;
 
 import java.util.HashMap;
@@ -18,21 +18,40 @@ public class AccountManager {
 
     private HashMap<String, Account> namesToAccounts = new HashMap<String, Account>();
     private Account activeAccount;
-
-    public void executeRequest(Request request) {
-
-    }
-
+    
     /**
      * Adds a new account to
-     * 
+     *
      * @param newAccount The new account created
      */
     public void addAccount(Account newAccount) {
         namesToAccounts.put(newAccount.getName(), newAccount);
     }
     
-    
+    private void executeCreateRequest(Request request) {
+        
+    }
+
+    public void executeRequest(Request request) throws InvalidInputException {
+        switch (request.getAction()) {
+            case "create":
+            //executeCreateRequest(request);
+            case "delete":
+            //executeDeleteRequest(request);
+            case "help":
+            //executeHelpRequest();
+            case "history":
+            //executeHistoryRequest();
+            case "open":
+            //executeOpenRequest(request);
+            case "sort":
+            //executeSortRequest();
+            default:
+                throw new InvalidInputException("Request " + request.getAction()
+                        + "is not recognized");
+        }
+    }
+
     /**
      * Creates various Accounts from a JSONObject representation
      *
@@ -47,15 +66,6 @@ public class AccountManager {
         }
     }
 
-    
-    public void setActiveAccount(String accountName) throws AccountNotFoundException {
-        if (! namesToAccounts.containsKey(accountName)) {
-            throw new AccountNotFoundException("The account " + accountName
-                + "is not recognized");
-        }
-        activeAccount = namesToAccounts.get(accountName);
-    }
-    
     public Set<String> getAccountNames() throws AccountNotFoundException {
         if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("No accounts are currently loaded");
@@ -63,4 +73,11 @@ public class AccountManager {
         return namesToAccounts.keySet();
     }
 
+    public void setActiveAccount(String accountName) throws AccountNotFoundException {
+        if (!namesToAccounts.containsKey(accountName)) {
+            throw new AccountNotFoundException("The account " + accountName
+                    + "is not recognized");
+        }
+        activeAccount = namesToAccounts.get(accountName);
+    }
 }

@@ -20,10 +20,10 @@ public class Account {
     private static final int SORTED_CHRONOLOGICALLY = 1;
     private static final int SORTED_BY_COST = 2;
     private static final int SORTED_BY_CATEGORY = 3;
-    
+
     private int sortingMethod;
     private LinkedList<Transaction> transactions = new LinkedList<>();
-    
+
     /**
      * Constructor for the Account class
      *
@@ -61,10 +61,10 @@ public class Account {
     public LinkedList<Transaction> getTransactions() {
         return transactions;
     }
-    
+
     /**
      * Returns the name of account
-     * 
+     *
      * @return The name of the account
      */
     public String getName() {
@@ -102,22 +102,22 @@ public class Account {
         }
         return returnedString.toString();
     }
-    
+
     /**
      * Sorts all transactions in the account in chronological order
      */
     private void sortChronologically() {
-        
+
     }
-    
+
     private void sortByCategory() {
-        
+
     }
-    
+
     private void sortByCost() {
-        
+
     }
-    
+
     public void setSortingMethod(int method) {
         switch (method) {
             case SORTED_CHRONOLOGICALLY:
@@ -131,4 +131,5 @@ public class Account {
                 sortingMethod = SORTED_BY_COST;
         }
     }
+
 }

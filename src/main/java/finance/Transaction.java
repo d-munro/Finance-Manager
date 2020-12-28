@@ -19,11 +19,11 @@ public class Transaction {
     private Date date;
 
     /**
-     * Constructor for the Transaction class
-     * By default, the date of the transaction is the current date
+     * Constructor for the Transaction class By default, the date of the
+     * transaction is the current date
      *
-     * @param item The physical object which caused the transaction
-     * to take place
+     * @param item The physical object which caused the transaction to take
+     * place
      */
     public Transaction(Item item) {
         this(item, new Date()); //Default date is current date
@@ -32,8 +32,8 @@ public class Transaction {
     /**
      * Constructor for the transaction class
      *
-     * @param item The physical object which caused the transaction
-     * to take place
+     * @param item The physical object which caused the transaction to take
+     * place
      * @param date Describes when the transaction occurred
      */
     public Transaction(Item item, Date date) {
@@ -64,8 +64,8 @@ public class Transaction {
     }
 
     /**
-     * The item describes the physical object which caused the transaction
-     * to take place.
+     * The item describes the physical object which caused the transaction to
+     * take place.
      *
      * @return The item involved in the transaction
      */
@@ -74,8 +74,8 @@ public class Transaction {
     }
 
     /**
-     * The date describes when the transaction was created.
-     * It is in the format year-month-day.
+     * The date describes when the transaction was created. It is in the format
+     * year-month-day.
      *
      * @return The date of the transaction
      */
@@ -88,7 +88,9 @@ public class Transaction {
      */
     @Override
     public String toString() {
-        return item + new SimpleDateFormat("yyyy-MM-dd").format(date);
+        return "-----------Transaction----------"
+                + "\n" + item
+                + "\nDate: " + new SimpleDateFormat("yyyy-MM-dd").format(date);
     }
 
 }

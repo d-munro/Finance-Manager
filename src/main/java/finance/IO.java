@@ -8,7 +8,6 @@ package finance;
 
 //imports
 import org.json.simple.JSONObject;
-import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -16,7 +15,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.ArrayList;
 
 /**
  * Handles all input and output for the finance package
@@ -39,10 +37,11 @@ public class IO {
         manager.addAccount(new Account(name));
     }*/
 
+    
     /**
      * Displays all options that a user can choose to display info
      */
-    public void displayOptions() {
+    /*public void displayOptions() {
         System.out.println("Type create to make a new account");
         System.out.println("Type delete to delete an account");
         System.out.println("Type history to display all previous transactions"
@@ -51,7 +50,7 @@ public class IO {
         System.out.println("Type quit to terminate the program");
         System.out.println("Type sort to sort account transactions");
         System.out.println("Type display accounts to display all accounts loaded");
-    }
+    }*/
 
     /**
      * Obtains the path from the user to the JSON file with account details
@@ -227,17 +226,19 @@ public class IO {
      */
     private void run(Scanner input) {
         String userChoice = "";
+        String output;
         Request currentRequest;
         System.out.println("To view a list of all options, type \"help\"");
         while (userChoice.compareToIgnoreCase("quit") != 0) {
             System.out.println("What would you like to do?");
-            displayOptions();
+            System.out.println(AccountManager.getHelp());
             userChoice = input.nextLine();
             try {
                 currentRequest = new Request(userChoice, getAccountRequestParameters(userChoice, input));
-                //manager.executeRequest(currentRequest);
-            } catch (InvalidInputException e) {
-                System.out.println(e.getMessage());
+                output = manager.executeRequest(currentRequest);
+                System.out.println(output + "\n");
+            } catch (InvalidInputException | AccountNotFoundException e) {
+                System.out.println(e.getMessage() + "\n");
             }
         }
     }

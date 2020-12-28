@@ -36,8 +36,6 @@ public class IO {
         name = input.nextLine();
         manager.addAccount(new Account(name));
     }*/
-
-    
     /**
      * Displays all options that a user can choose to display info
      */
@@ -51,7 +49,6 @@ public class IO {
         System.out.println("Type sort to sort account transactions");
         System.out.println("Type display accounts to display all accounts loaded");
     }*/
-
     /**
      * Obtains the path from the user to the JSON file with account details
      *
@@ -72,17 +69,19 @@ public class IO {
         }
         return fileStream;
     }
-    
+
     /**
-     * Obtains all necessary user input to create a request object for an account
-     * 
+     * Obtains all necessary user input to create a request object for an
+     * account
+     *
      * @param requestChoice The user's decision as to what to do next
      * @param input The Scanner which user input is being read from
-     * @return String containing necessary parameters to initialize a request object
+     * @return String containing necessary parameters to initialize a request
+     * object
      */
     private String getAccountRequestParameters(String requestChoice, Scanner input) {
         String params = null;
-        switch (requestChoice){ //Handles cases where multiple parameters are needed
+        switch (requestChoice) { //Handles cases where multiple parameters are needed
             case "create":
                 System.out.println("Enter the name of the account:");
                 params = input.nextLine();
@@ -113,7 +112,7 @@ public class IO {
                         + "transactions by category");
                 params = input.nextLine();
                 break;
-        }               
+        }
         return params;
     }
 
@@ -249,7 +248,7 @@ public class IO {
             System.out.println(current);
         }
         System.out.println("Enter an account to view:");
-        manager.setActiveAccount(input.nextLine());
+        //manager.setActiveAccount(input.nextLine());
     }
 
 }

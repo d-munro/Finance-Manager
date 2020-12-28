@@ -20,7 +20,7 @@ public class AccountManager {
     private Account activeAccount;
 
     /**
-     * Adds a new account to
+     * Adds a new account to the HashMap of accounts
      *
      * @param newAccount The new account created
      */
@@ -45,11 +45,18 @@ public class AccountManager {
     }
 
     private String executeDeleteRequest(Request request) throws AccountNotFoundException {
-        //TODO Complete method
         if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("There are currently no accounts loaded");
         }
-        return "In delete";
+        if (namesToAccounts.get(request.getArgs()) == null) {
+            throw new AccountNotFoundException("The account \"" +
+                    request.getArgs() + "\" does not exist");
+        }
+        if (namesToAccounts.get(request.getArgs()).equals(activeAccount)) {
+            activeAccount = null;
+        }
+        namesToAccounts.remove(request.getArgs());
+        return "The account \"" + request.getArgs() + "\" has been deleted.";
     }
 
     private String executeDisplayRequest() throws AccountNotFoundException {
@@ -74,9 +81,9 @@ public class AccountManager {
         return sb.toString();
     }
 
-    private String executeOpenRequest(Request request) {
-        //TODO Complete method
-        return "In open";
+    private String executeOpenRequest(Request request) throws AccountNotFoundException {
+        setActiveAccount(request.getArgs());
+        return request.getArgs() + " is now the active account.";
     }
 
     private String executeQuitRequest() {
@@ -157,14 +164,6 @@ public class AccountManager {
         return activeAccount.getName();
     }
 
-    public void setActiveAccount(String accountName) throws AccountNotFoundException {
-        if (!namesToAccounts.containsKey(accountName)) {
-            throw new AccountNotFoundException("The account " + accountName
-                    + "is not recognized");
-        }
-        activeAccount = namesToAccounts.get(accountName);
-    }
-
     /**
      *
      *
@@ -176,8 +175,17 @@ public class AccountManager {
                 + "\nType display to display all accounts currently loaded"
                 + "\nType history to display all previous transactions"
                 + " for the current account"
-                + "\nType open to open a new account"
+                + "\nType open to open a different account"
                 + "\nType quit to terminate the program"
                 + "\nType sort to sort account transactions";
     }
+    
+    private void setActiveAccount(String accountName) throws AccountNotFoundException {
+        if (!namesToAccounts.containsKey(accountName)) {
+            throw new AccountNotFoundException("The account " + accountName
+                    + " is not recognized");
+        }
+        activeAccount = namesToAccounts.get(accountName);
+    }
+
 }

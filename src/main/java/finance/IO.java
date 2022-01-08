@@ -39,16 +39,46 @@ public class IO {
     /**
      * Displays all options that a user can choose to display info
      */
-    /*public void displayOptions() {
+    public void displayOptions() {
         System.out.println("Type create to make a new account");
         System.out.println("Type delete to delete an account");
+        System.out.println("Type edit to modify the transactions for the current account");
         System.out.println("Type history to display all previous transactions"
                 + " for the current account");
         System.out.println("Type open to open a new account");
         System.out.println("Type quit to terminate the program");
         System.out.println("Type sort to sort account transactions");
         System.out.println("Type display accounts to display all accounts loaded");
-    }*/
+    }
+
+    public void editAccount(Scanner input) {
+        String answer;
+        String name;
+        double fee;
+        String category;
+        int quantity;
+        int validResponse = 0;
+        do {
+            System.out.println("Enter the name of the item");
+            name = input.nextLine();
+            System.out.println("Enter the category of the item");
+            category = input.nextLine();
+            System.out.println("Enter the cost of the item");
+            try {
+                
+            } catch (Exception e) {
+                
+            }
+            answer = getYesOrNoResponse("Would you like to add a transaction to the account? (Yes/No)", input);
+        } while (answer.compareToIgnoreCase("no") != 0);
+        {
+
+        }
+        if (answer.compareToIgnoreCase("yes") == 0) {
+            //Request 
+        }
+    }
+
     /**
      * Obtains the path from the user to the JSON file with account details
      *
@@ -104,11 +134,11 @@ public class IO {
                 System.out.println("");
                 break;*/
             case "sort":
-                System.out.println("Enter chronologically to sort the "
+                System.out.println("Enter 1 to sort the "
                         + "transactions chronologically");
-                System.out.println("Enter cost to sort the "
+                System.out.println("Enter 2 to sort the "
                         + "transactions by cost");
-                System.out.println("Enter category to sort the "
+                System.out.println("Enter 3 to sort the "
                         + "transactions by category");
                 params = input.nextLine();
                 break;
@@ -149,6 +179,20 @@ public class IO {
     private boolean isYesOrNoResponse(String str) {
         return (str.compareToIgnoreCase("Yes") == 0
                 || str.compareToIgnoreCase("No") == 0);
+    }
+    
+    /**
+     * Determines if a string can be converted to an integer
+     * @param str The string being converted
+     * @return true if the string can be converted to an integer, false otherwise
+     */
+    private boolean isInteger(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (!(str.charAt(i) >= 48 && str.charAt(i) <= 57)) { //Check if ascii value of char gives a digit
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -238,6 +282,8 @@ public class IO {
                 System.out.println(output + "\n");
             } catch (InvalidInputException | AccountNotFoundException e) {
                 System.out.println(e.getMessage() + "\n");
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number");
             }
         }
     }

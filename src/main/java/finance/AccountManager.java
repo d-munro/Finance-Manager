@@ -18,13 +18,14 @@ public class AccountManager {
 
     private HashMap<String, Account> namesToAccounts = new HashMap<String, Account>();
     private Account activeAccount;
+    private int numOfAccountsLoaded;
 
     /**
      * Adds a new account to the HashMap of accounts
      *
      * @param newAccount The new account created
      */
-    public void addAccount(Account newAccount) {
+    private void addAccount(Account newAccount) {
         namesToAccounts.put(newAccount.getName(), newAccount);
     }
 
@@ -49,8 +50,8 @@ public class AccountManager {
             throw new AccountNotFoundException("There are currently no accounts loaded");
         }
         if (namesToAccounts.get(request.getArgs()) == null) {
-            throw new AccountNotFoundException("The account \"" +
-                    request.getArgs() + "\" does not exist");
+            throw new AccountNotFoundException("The account \""
+                    + request.getArgs() + "\" does not exist");
         }
         if (namesToAccounts.get(request.getArgs()).equals(activeAccount)) {
             activeAccount = null;
@@ -125,8 +126,13 @@ public class AccountManager {
         return output;
     }
 
-    private String executeSortRequest(Request request) {
+    private String executeSortRequest(Request request) throws InvalidInputException {
         //TODO Complete method
+        try {
+           activeAccount.setSortingMethod(Integer.parseInt(request.getArgs()));           
+        } catch (NumberFormatException e) {
+            throw new InvalidInputException("Please enter 1, 2, or 3");
+        }
         return "In sort";
     }
 
@@ -138,9 +144,13 @@ public class AccountManager {
      */
     public void generateAccounts(JSONObject obj) throws
             CorruptJSONObjectException {
+        Account currentAccount;
         JSONArray accountsArray = (JSONArray) obj.get("accounts");
         for (int i = 0; i < accountsArray.size(); i++) {
-            addAccount(new Account((JSONObject) accountsArray.get(i)));
+            currentAccount = new Account((JSONObject) accountsArray.get(i));
+            if (accountsArray.size() == 1) {
+                setActiveAccount(currentAccount);
+            }
         }
     }
 
@@ -179,7 +189,7 @@ public class AccountManager {
                 + "\nType quit to terminate the program"
                 + "\nType sort to sort account transactions";
     }
-    
+
     private void setActiveAccount(String accountName) throws AccountNotFoundException {
         if (!namesToAccounts.containsKey(accountName)) {
             throw new AccountNotFoundException("The account " + accountName
@@ -187,5 +197,12 @@ public class AccountManager {
         }
         activeAccount = namesToAccounts.get(accountName);
     }
-
+    
+    private void setActiveAccount(Account account) {
+        activeAccount = account;
+    }
+    
+    private void setNumOfAccountsLoaded(int num) {
+        numOfAccountsLoaded = num;
+    }
 }

@@ -28,6 +28,10 @@ public class Transaction {
     public Transaction(Item item) {
         this(item, new Date()); //Default date is current date
     }
+    
+    public Transaction(Item item, Date date) {
+        this(item, date, 1);
+    }
 
     /**
      * Constructor for the transaction class
@@ -35,10 +39,12 @@ public class Transaction {
      * @param item The physical object which caused the transaction to take
      * place
      * @param date Describes when the transaction occurred
+     * @param quantity The quantity of items purchased
      */
-    public Transaction(Item item, Date date) {
+    public Transaction(Item item, Date date, int quantity) {
         this.item = item;
         this.date = date;
+        this.quantity = quantity;
     }
 
     /**

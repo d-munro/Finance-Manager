@@ -23,6 +23,7 @@ public class Request {
         VALID_REQUESTS_ONE_PARAM.put("history", true);
         VALID_REQUESTS_ONE_PARAM.put("quit", true);
         VALID_REQUESTS_ONE_PARAM.put("display", true);
+        VALID_REQUESTS_ONE_PARAM.put("edit", true);
 
         VALID_REQUESTS_TWO_PARAMS = new HashMap<String, Boolean>();
         VALID_REQUESTS_TWO_PARAMS.put("sort", true);

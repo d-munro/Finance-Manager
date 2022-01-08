@@ -17,9 +17,9 @@ public class Account {
 
     //constants
     private final String name;
-    private static final int SORTED_CHRONOLOGICALLY = 1;
-    private static final int SORTED_BY_COST = 2;
-    private static final int SORTED_BY_CATEGORY = 3;
+    public static final int SORTED_CHRONOLOGICALLY = 1;
+    public static final int SORTED_BY_COST = 2;
+    public static final int SORTED_BY_CATEGORY = 3;
 
     private int sortingMethod;
     private LinkedList<Transaction> transactions = new LinkedList<>();
@@ -69,6 +69,20 @@ public class Account {
      */
     public String getName() {
         return name;
+    }
+    
+    /**
+     * Determines if the desired method of being sorted is recognized by Account
+     * 
+     * @param sortingMethod The requested method of being sorted. sortingMethod
+     * should either equal the constant SORTED_CHRONOLOGICALLY (1),
+     * SORTED_BY_COST (2), or SORTED_BY_CATEGORY (3)
+     * @return true if the sortingMethod is valid, false if invalid
+     */
+    public boolean isValidSortingMethod(int sortingMethod) {
+        return sortingMethod == SORTED_CHRONOLOGICALLY
+                || sortingMethod == SORTED_BY_COST
+                || sortingMethod == SORTED_BY_CATEGORY;
     }
 
     /**

@@ -1,4 +1,6 @@
-//TODO Rewrite valid parameters to make them more intuitive
+//TODO
+//Create subclasses for AccountRequest and TransactionRequest
+//Complete request parsing for requests containing args
 package finance;
 
 //imports
@@ -11,29 +13,31 @@ import java.util.HashMap;
  */
 public class Request {
 
-    private static final HashMap<String, Boolean> VALID_REQUESTS_ONE_PARAM;
-    private static final HashMap<String, Boolean> VALID_REQUESTS_TWO_PARAMS;
+    public static final HashMap<String, String> ONE_PARAM_ACTION_DESCRIPTIONS;
+    public static final HashMap<String, String> TWO_PARAM_ACTION_DESCRIPTIONS;
     private String action;
     private String args;
+    private boolean isAccountRequest;
+    private boolean isTransactionRequest;
     
     //Necessary for all operations involving transactions due to the number of arguments
     private Transaction transaction;
 
-    //Static initialization of VALID_REQUESTS_ONE_PARAM
+    //Static initialization of ONE_PARAM_ACTION_DESCRIPTIONS
     static {
-        VALID_REQUESTS_ONE_PARAM = new HashMap<String, Boolean>();
-        VALID_REQUESTS_ONE_PARAM.put("help", true);
-        VALID_REQUESTS_ONE_PARAM.put("history", true);
-        VALID_REQUESTS_ONE_PARAM.put("quit", true);
-        VALID_REQUESTS_ONE_PARAM.put("display", true);
-        VALID_REQUESTS_ONE_PARAM.put("edit", true);
+        ONE_PARAM_ACTION_DESCRIPTIONS = new HashMap<String, String>();
+        ONE_PARAM_ACTION_DESCRIPTIONS.put("help", "add a transaction to the current active account");
+        ONE_PARAM_ACTION_DESCRIPTIONS.put("quit", "terminate the program");
 
-        VALID_REQUESTS_TWO_PARAMS = new HashMap<String, Boolean>();
-        VALID_REQUESTS_TWO_PARAMS.put("sort", true);
-        VALID_REQUESTS_TWO_PARAMS.put("open", true); //search for new account
-        VALID_REQUESTS_TWO_PARAMS.put("create", true);
-        VALID_REQUESTS_TWO_PARAMS.put("delete", true);
-        VALID_REQUESTS_TWO_PARAMS.put("transaction", true);
+        TWO_PARAM_ACTION_DESCRIPTIONS = new HashMap<String, String>();
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("add account", "make a new account");
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("add transaction", "add a transaction to the current active account");
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("change", "change the active account");
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("delete account", "delete an account");
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("delete transaction", "delete a transaction from the current active account");
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("display account", "display all currently loaded accounts");
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("display transaction", "display all transactions for the current active account");
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("sort", "sort the transactions for the current active account");
     }
 
     /**
@@ -53,7 +57,7 @@ public class Request {
      * @throws InvalidInputException
      */
     public Request(String action) throws InvalidInputException {
-        this(action, null);
+        this(action, "");
     }
 
     /**
@@ -68,28 +72,35 @@ public class Request {
      * @throws InvalidInputException
      */
     public Request(String action, String args) throws InvalidInputException {
-        if (VALID_REQUESTS_ONE_PARAM.containsKey(action)) { //valid 1 param request
+        action = action.toLowerCase();
+        if (ONE_PARAM_ACTION_DESCRIPTIONS.containsKey(action)) { //valid 1 param request
             this.action = action;
-        } else if (VALID_REQUESTS_TWO_PARAMS.containsKey(action) && args == null) {
+        } else if (TWO_PARAM_ACTION_DESCRIPTIONS.containsKey(action) && args == "") {
             throw new InvalidInputException("You must enter an argument to "
                     + "use with " + action);
-        } else if (!VALID_REQUESTS_TWO_PARAMS.containsKey(action)) {
+        } else if (!TWO_PARAM_ACTION_DESCRIPTIONS.containsKey(action)) {
             throw new InvalidInputException("The request \"" + action
                     + "\" is not recognized or requires no arguments");
         } else { //valid 2 param request
-            this.action = action;
-            this.args = args;
+            parseRequestWithArgs(action, args);
         }
     }
     
-    public Request(String action, String args, Transaction transaction) throws InvalidInputException {
+    public Request(String action, Transaction transaction) throws InvalidInputException {
+        action = action.toLowerCase();
         if (action.compareToIgnoreCase("transaction") != 0) {
             throw new InvalidInputException("Transaction argument passed "
                     + "when action does not relate to transactions");
         }
         this.action = action;
-        this.args = args;
         this.transaction = transaction;
+    }
+    
+    private void parseRequestWithArgs(String action, String args) {
+        //Determine if the request action deals with a transaction or account
+        
+        this.action = action;
+        this.args = args;
     }
 
     /**
@@ -104,6 +115,10 @@ public class Request {
     
     public String getArgs() {
         return args;
+    }
+    
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
     
     public Transaction getTransaction() {

@@ -2,7 +2,8 @@
 Display a meaningful message if user enters an invalid filepath
     (No valid json file is present at location)
 Don't put account prompting in load
-Change fmanager implementation in main
+Check if requests containing args are for accounts or classes
+Rewrite to work with new Request implementation
  */
 package finance;
 
@@ -126,21 +127,18 @@ public class IO {
      * @return String containing necessary parameters to initialize a request
      * object
      */
-    private String getAccountRequestParameters(String requestChoice, Scanner input) {
+    private String getRequestArgs(String requestChoice, Scanner input) {
         String params = null;
         switch (requestChoice) { //Handles cases where multiple parameters are needed
-            case "create":
+            case "add account":
                 System.out.println("Enter the name of the account:");
                 params = input.nextLine();
                 break;
-            /*case "display accounts":
-                System.out.println("");
-                break;*/
-            case "delete":
-                System.out.println("Enter the name of the account to delete:");
+            case "change":
                 params = input.nextLine();
                 break;
-            case "edit":
+            case "delete account":
+                System.out.println("Enter the name of the account to delete:");
                 params = input.nextLine();
                 break;
             /*case "history":

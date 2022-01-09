@@ -28,7 +28,7 @@ public class AccountManager {
      * creation
      * @return Message indicating that account creation was successful
      */
-    private String executeCreateRequest(Request request) {
+    private String executeAddAccountRequest(Request request) {
         String accountName = request.getArgs();
         Account account = new Account(accountName);
         namesToAccounts.put(account.getName(), account);
@@ -37,7 +37,7 @@ public class AccountManager {
                 + "\n" + accountName + " is now the active account.";
     }
 
-    private String executeDeleteRequest(Request request) throws AccountNotFoundException {
+    private String executeDeleteAccountRequest(Request request) throws AccountNotFoundException {
         StringBuilder returnedString = new StringBuilder();
         if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("There are currently no accounts loaded");
@@ -58,7 +58,7 @@ public class AccountManager {
         return returnedString.toString();
     }
 
-    private String executeDisplayRequest() throws AccountNotFoundException {
+    private String executeDisplayAccountRequest() throws AccountNotFoundException {
         StringBuilder sb = new StringBuilder();
         for (String current : getAccountNames()) {
             sb.append(current).append("\n");
@@ -66,7 +66,7 @@ public class AccountManager {
         return sb.toString();
     }
 
-    private String executeHistoryRequest() throws AccountNotFoundException {
+    private String executeDisplayTransactionRequest() throws AccountNotFoundException {
         if (activeAccount == null) {
             throw new AccountNotFoundException("No active account selected");
         }
@@ -80,7 +80,7 @@ public class AccountManager {
         return sb.toString();
     }
 
-    private String executeOpenRequest(Request request) throws AccountNotFoundException {
+    private String executeChangeRequest(Request request) throws AccountNotFoundException {
         setActiveAccount(request.getArgs());
         return request.getArgs() + " is now the active account.";
     }
@@ -93,36 +93,49 @@ public class AccountManager {
             throws AccountNotFoundException, InvalidInputException {
         String output = "";
         switch (request.getAction()) {
+            case "add account":
+                System.out.println("add acc");
+                output = executeAddAccountRequest(request);
+                break;
             case "add transaction":
+                System.out.println("add trans");
                 //output = executeAddTransactionRequest(request);
                 break;
-            case "create":
-                output = executeCreateRequest(request);
+            case "change":
+                System.out.println("change");
+                output = executeChangeRequest(request);
                 break;
-            case "delete":
-                output = executeDeleteRequest(request);
+            case "delete account":
+                System.out.println("delete account");
+                output = executeDeleteAccountRequest(request);
                 break;
-            case "display":
-                output = executeDisplayRequest();
+            case "delete transaction":
+                System.out.println("delete transaction");
+                //output = executeDeleteTransactionRequest(request);
+                break;
+            case "display account":
+                System.out.println("display account");
+                output = executeDisplayAccountRequest();
+                break;
+            case "display transaction":
+                System.out.println("display transaction");
+                output = executeDisplayTransactionRequest();
                 break;
             case "help":
+                System.out.println("help");
                 output = getHelp();
                 break;
-            case "history":
-                output = executeHistoryRequest();
-                break;
-            case "open":
-                output = executeOpenRequest(request);
-                break;
             case "quit":
+                System.out.println("quit");
                 output = executeQuitRequest();
                 break;
             case "sort":
+                System.out.println("sort");
                 output = executeSortRequest(request);
                 break;
             default:
-                throw new InvalidInputException("Request " + request.getAction()
-                        + "is not recognized");
+                throw new InvalidInputException("Request \"" + request.getAction()
+                        + "\" is not recognized");
         }
         return output;
     }
@@ -183,15 +196,23 @@ public class AccountManager {
      * @return A list of useful commands for executing the program
      */
     public static String getHelp() {
-        return "Type create to make a new account"
-                + "\nType delete to delete an account"
-                + "\nType display to display all accounts currently loaded"
-                + "\nType edit to modify the transactions for the current account"
-                + "\nType history to display all previous transactions"
-                + " for the current account"
-                + "\nType open to open a different account"
-                + "\nType quit to terminate the program"
-                + "\nType sort to sort account transactions";
+        StringBuilder sb = new StringBuilder();
+        for (HashMap.Entry<String, String> current : Request.ONE_PARAM_ACTION_DESCRIPTIONS.entrySet()) {
+            sb.append("Type \"").append(current.getKey()).append("\" to ").append(current.getValue()).append("\n");
+        }
+        for (HashMap.Entry<String, String> current : Request.TWO_PARAM_ACTION_DESCRIPTIONS.entrySet()) {
+            sb.append("Type \"").append(current.getKey()).append("\" to ").append(current.getValue()).append("\n");
+        }
+        return sb.toString();
+        /*return "Type \"add account\" to make a new account"
+                + "\nType \"add transaction\" to add a transaction to the current active account"
+                + "\nType \"change\" to change the active account"
+                + "\nType \"delete account\" to delete an account"
+                + "\nType \"delete transaction\" to delete a transaction from the current active account"
+                + "\nType \"display account\" to display all currently loaded accounts"
+                + "\nType \"display transaction\" to display all transactions for the current active account"
+                + "\nType \"quit\" to terminate the program"
+                + "\nType \"sort\" to sort the transactions for the current active account";*/
     }
 
     private void setActiveAccount(String accountName) throws AccountNotFoundException {

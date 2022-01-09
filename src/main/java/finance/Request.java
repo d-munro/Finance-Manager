@@ -14,8 +14,10 @@ public class Request {
     private static final HashMap<String, Boolean> VALID_REQUESTS_ONE_PARAM;
     private static final HashMap<String, Boolean> VALID_REQUESTS_TWO_PARAMS;
     private String action;
-    private String name;
     private String args;
+    
+    //Necessary for all operations involving transactions due to the number of arguments
+    private Transaction transaction;
 
     //Static initialization of VALID_REQUESTS_ONE_PARAM
     static {
@@ -31,7 +33,7 @@ public class Request {
         VALID_REQUESTS_TWO_PARAMS.put("open", true); //search for new account
         VALID_REQUESTS_TWO_PARAMS.put("create", true);
         VALID_REQUESTS_TWO_PARAMS.put("delete", true);
-        VALID_REQUESTS_TWO_PARAMS.put("add transaction", true);
+        VALID_REQUESTS_TWO_PARAMS.put("transaction", true);
     }
 
     /**
@@ -79,6 +81,16 @@ public class Request {
             this.args = args;
         }
     }
+    
+    public Request(String action, String args, Transaction transaction) throws InvalidInputException {
+        if (action.compareToIgnoreCase("transaction") != 0) {
+            throw new InvalidInputException("Transaction argument passed "
+                    + "when action does not relate to transactions");
+        }
+        this.action = action;
+        this.args = args;
+        this.transaction = transaction;
+    }
 
     /**
      * Returns the action of the user's command. The action describes the
@@ -92,5 +104,9 @@ public class Request {
     
     public String getArgs() {
         return args;
+    }
+    
+    public Transaction getTransaction() {
+        return transaction;
     }
 }

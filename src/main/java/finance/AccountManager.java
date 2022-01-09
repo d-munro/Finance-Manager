@@ -21,15 +21,6 @@ public class AccountManager {
     private int numOfAccountsLoaded;
 
     /**
-     * Adds a new account to the HashMap of accounts
-     *
-     * @param newAccount The new account created
-     */
-    private void addAccount(Account newAccount) {
-        namesToAccounts.put(newAccount.getName(), newAccount);
-    }
-
-    /**
      * Creates a new account with details specified from request. This new
      * account is set to be the active account
      *
@@ -39,13 +30,15 @@ public class AccountManager {
      */
     private String executeCreateRequest(Request request) {
         String accountName = request.getArgs();
-        addAccount(new Account(accountName));
-        activeAccount = namesToAccounts.get(accountName);
+        Account account = new Account(accountName);
+        namesToAccounts.put(account.getName(), account);
+        activeAccount = account;
         return "New account created with the name " + accountName + "."
                 + "\n" + accountName + " is now the active account.";
     }
 
     private String executeDeleteRequest(Request request) throws AccountNotFoundException {
+        StringBuilder returnedString = new StringBuilder();
         if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("There are currently no accounts loaded");
         }
@@ -57,7 +50,12 @@ public class AccountManager {
             activeAccount = null;
         }
         namesToAccounts.remove(request.getArgs());
-        return "The account \"" + request.getArgs() + "\" has been deleted.";
+        numOfAccountsLoaded--;
+        returnedString.append("The account \"").append(request.getArgs()).append("\" has been deleted.");
+        if (numOfAccountsLoaded == 1) {
+            setActiveAccount(namesToAccounts.entrySet().iterator().next().getKey());
+        }
+        return returnedString.toString();
     }
 
     private String executeDisplayRequest() throws AccountNotFoundException {
@@ -95,6 +93,9 @@ public class AccountManager {
             throws AccountNotFoundException, InvalidInputException {
         String output = "";
         switch (request.getAction()) {
+            case "add transaction":
+                //output = executeAddTransactionRequest(request);
+                break;
             case "create":
                 output = executeCreateRequest(request);
                 break;
@@ -141,15 +142,17 @@ public class AccountManager {
      *
      * @param obj JSONObject containing details necessary for account creation
      * @throws CorruptJSONObjectException
+     * @throws AccountNotFoundException
      */
     public void generateAccounts(JSONObject obj) throws
-            CorruptJSONObjectException {
+            CorruptJSONObjectException, AccountNotFoundException {
         Account currentAccount;
         JSONArray accountsArray = (JSONArray) obj.get("accounts");
         for (int i = 0; i < accountsArray.size(); i++) {
             currentAccount = new Account((JSONObject) accountsArray.get(i));
+            namesToAccounts.put(currentAccount.getName(), currentAccount);
             if (accountsArray.size() == 1) {
-                setActiveAccount(currentAccount);
+                setActiveAccount(currentAccount.getName());
             }
         }
     }
@@ -183,6 +186,7 @@ public class AccountManager {
         return "Type create to make a new account"
                 + "\nType delete to delete an account"
                 + "\nType display to display all accounts currently loaded"
+                + "\nType edit to modify the transactions for the current account"
                 + "\nType history to display all previous transactions"
                 + " for the current account"
                 + "\nType open to open a different account"
@@ -196,13 +200,5 @@ public class AccountManager {
                     + " is not recognized");
         }
         activeAccount = namesToAccounts.get(accountName);
-    }
-    
-    private void setActiveAccount(Account account) {
-        activeAccount = account;
-    }
-    
-    private void setNumOfAccountsLoaded(int num) {
-        numOfAccountsLoaded = num;
     }
 }

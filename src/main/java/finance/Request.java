@@ -1,3 +1,4 @@
+//TODO Rewrite valid parameters to make them more intuitive
 package finance;
 
 //imports
@@ -30,6 +31,7 @@ public class Request {
         VALID_REQUESTS_TWO_PARAMS.put("open", true); //search for new account
         VALID_REQUESTS_TWO_PARAMS.put("create", true);
         VALID_REQUESTS_TWO_PARAMS.put("delete", true);
+        VALID_REQUESTS_TWO_PARAMS.put("add transaction", true);
     }
 
     /**

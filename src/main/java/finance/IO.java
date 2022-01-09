@@ -39,7 +39,7 @@ public class IO {
     /**
      * Displays all options that a user can choose to display info
      */
-    public void displayOptions() {
+    /*public void displayOptions() {
         System.out.println("Type create to make a new account");
         System.out.println("Type delete to delete an account");
         System.out.println("Type edit to modify the transactions for the current account");
@@ -49,34 +49,51 @@ public class IO {
         System.out.println("Type quit to terminate the program");
         System.out.println("Type sort to sort account transactions");
         System.out.println("Type display accounts to display all accounts loaded");
-    }
+    }*/
 
-    public void editAccount(Scanner input) {
-        String answer;
+    private void editAccount(Scanner input) throws NumberFormatException{
+        String cont;
         String name;
         double fee;
         String category;
         int quantity;
-        int validResponse = 0;
         do {
             System.out.println("Enter the name of the item");
             name = input.nextLine();
             System.out.println("Enter the category of the item");
             category = input.nextLine();
             System.out.println("Enter the cost of the item");
+            fee = getDouble(input, "Enter the cost of the item");
+            quantity = (int)getDouble(input, "Enter the quantity of the item purchased");           
+            cont = getYesOrNoResponse("Would you like to add a transaction to the account? (Yes/No)", input);
             try {
-                
+              manager.executeRequest(new Request("add transaction"));                
             } catch (Exception e) {
-                
+                System.out.println(e.getMessage());
             }
-            answer = getYesOrNoResponse("Would you like to add a transaction to the account? (Yes/No)", input);
-        } while (answer.compareToIgnoreCase("no") != 0);
-        {
-
+        } while (cont.compareToIgnoreCase("no") != 0);
+        
+    }
+    
+    /**
+     * Obtains a double from a prompt with exception checking
+     * @param input The Scanner reading the user's input
+     * @param prompt The question to prompt the user with
+     * @return A valid double
+     */
+    public double getDouble(Scanner input, String prompt) {
+        double response = 0;
+        boolean isValidResponse = false;
+        while (!isValidResponse) {
+            try {
+                System.out.println(prompt);
+                response = input.nextDouble();
+                isValidResponse = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a number without alphabetical characters");
+            }           
         }
-        if (answer.compareToIgnoreCase("yes") == 0) {
-            //Request 
-        }
+        return response;
     }
 
     /**
@@ -121,6 +138,9 @@ public class IO {
                 break;*/
             case "delete":
                 System.out.println("Enter the name of the account to delete:");
+                params = input.nextLine();
+                break;
+            case "edit":
                 params = input.nextLine();
                 break;
             /*case "history":
@@ -240,7 +260,7 @@ public class IO {
                 activeStream = getAccountFilePath(input);
                 accountsJson = loadAccountsJSON(activeStream);
                 manager.generateAccounts(accountsJson);
-            } catch (CorruptJSONObjectException e) {
+            } catch (CorruptJSONObjectException | AccountNotFoundException e) {
                 System.out.println(e.getMessage());
             } finally {
                 if (activeStream != null) {

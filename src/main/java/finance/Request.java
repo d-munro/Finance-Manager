@@ -1,6 +1,4 @@
-//TODO
-//Create subclasses for AccountRequest and TransactionRequest
-//Complete request parsing for requests containing args
+//TODO - Refactor Constructor so only action and data is required in subclasses
 package finance;
 
 //imports
@@ -12,16 +10,16 @@ import java.util.HashMap;
  * @author Dylan Munro
  */
 public class Request {
-
+    
+    //Constants
     public static final HashMap<String, String> ONE_PARAM_ACTION_DESCRIPTIONS;
     public static final HashMap<String, String> TWO_PARAM_ACTION_DESCRIPTIONS;
-    private String action;
-    private String args;
-    private boolean isAccountRequest;
-    private boolean isTransactionRequest;
+    public static final int NONE = 0;
+    public static final int ACCOUNT = 1;
+    public static final int TRANSACTION = 2;
     
-    //Necessary for all operations involving transactions due to the number of arguments
-    private Transaction transaction;
+    private String action;
+    private String specification;
 
     //Static initialization of ONE_PARAM_ACTION_DESCRIPTIONS
     static {
@@ -59,48 +57,30 @@ public class Request {
     public Request(String action) throws InvalidInputException {
         this(action, "");
     }
-
+  
     /**
      * Constructor
      *
      * @param action The keyword describing how the user wishes to change the
      * account
-     * @param args Specifies the object or method describing what the action is
-     * performed on
-     *
+     * @param specification Specifies the object that the action is performing on, 
+     * or how the action is being performed
      *
      * @throws InvalidInputException
-     */
-    public Request(String action, String args) throws InvalidInputException {
+     */    
+    public Request(String action, String specification) throws InvalidInputException {
         action = action.toLowerCase();
         if (ONE_PARAM_ACTION_DESCRIPTIONS.containsKey(action)) { //valid 1 param request
             this.action = action;
-        } else if (TWO_PARAM_ACTION_DESCRIPTIONS.containsKey(action) && args == "") {
+        } else if (TWO_PARAM_ACTION_DESCRIPTIONS.containsKey(action) && specification.compareTo("") == 0) {
             throw new InvalidInputException("You must enter an argument to "
                     + "use with " + action);
         } else if (!TWO_PARAM_ACTION_DESCRIPTIONS.containsKey(action)) {
             throw new InvalidInputException("The request \"" + action
                     + "\" is not recognized or requires no arguments");
-        } else { //valid 2 param request
-            parseRequestWithArgs(action, args);
-        }
-    }
-    
-    public Request(String action, Transaction transaction) throws InvalidInputException {
-        action = action.toLowerCase();
-        if (action.compareToIgnoreCase("transaction") != 0) {
-            throw new InvalidInputException("Transaction argument passed "
-                    + "when action does not relate to transactions");
-        }
+        } 
         this.action = action;
-        this.transaction = transaction;
-    }
-    
-    private void parseRequestWithArgs(String action, String args) {
-        //Determine if the request action deals with a transaction or account
-        
-        this.action = action;
-        this.args = args;
+        this.specification = specification;
     }
 
     /**
@@ -113,15 +93,7 @@ public class Request {
         return action;
     }
     
-    public String getArgs() {
-        return args;
-    }
-    
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
-    }
-    
-    public Transaction getTransaction() {
-        return transaction;
+    public String getSpecification() {
+        return specification;
     }
 }

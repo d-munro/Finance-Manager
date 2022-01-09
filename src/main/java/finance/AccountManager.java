@@ -1,4 +1,6 @@
 /*--------------------------------TODO---------------------
+Correct getSpecification() methods in account/transaction requests
+    -Either implement getSpecification() in appropriate classes, or change getSpecification() to getData()
 Complete delete, open, sort methods
 Be sure to check for instances where activeAccount = null
  */
@@ -29,7 +31,7 @@ public class AccountManager {
      * @return Message indicating that account creation was successful
      */
     private String executeAddAccountRequest(Request request) {
-        String accountName = request.getArgs();
+        String accountName = request.getSpecification();
         Account account = new Account(accountName);
         namesToAccounts.put(account.getName(), account);
         activeAccount = account;
@@ -42,16 +44,16 @@ public class AccountManager {
         if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("There are currently no accounts loaded");
         }
-        if (namesToAccounts.get(request.getArgs()) == null) {
+        if (namesToAccounts.get(request.getSpecification()) == null) {
             throw new AccountNotFoundException("The account \""
-                    + request.getArgs() + "\" does not exist");
+                    + request.getSpecification() + "\" does not exist");
         }
-        if (namesToAccounts.get(request.getArgs()).equals(activeAccount)) {
+        if (namesToAccounts.get(request.getSpecification()).equals(activeAccount)) {
             activeAccount = null;
         }
-        namesToAccounts.remove(request.getArgs());
+        namesToAccounts.remove(request.getSpecification());
         numOfAccountsLoaded--;
-        returnedString.append("The account \"").append(request.getArgs()).append("\" has been deleted.");
+        returnedString.append("The account \"").append(request.getSpecification()).append("\" has been deleted.");
         if (numOfAccountsLoaded == 1) {
             setActiveAccount(namesToAccounts.entrySet().iterator().next().getKey());
         }
@@ -81,8 +83,8 @@ public class AccountManager {
     }
 
     private String executeChangeRequest(Request request) throws AccountNotFoundException {
-        setActiveAccount(request.getArgs());
-        return request.getArgs() + " is now the active account.";
+        setActiveAccount(request.getSpecification());
+        return request.getSpecification() + " is now the active account.";
     }
 
     private String executeQuitRequest() {
@@ -143,7 +145,7 @@ public class AccountManager {
     private String executeSortRequest(Request request) throws InvalidInputException {
         //TODO Complete method
         try {
-           activeAccount.setSortingMethod(Integer.parseInt(request.getArgs()));           
+           activeAccount.setSortingMethod(Integer.parseInt(request.getSpecification()));           
         } catch (NumberFormatException e) {
             throw new InvalidInputException("Please enter 1, 2, or 3");
         }
@@ -204,15 +206,6 @@ public class AccountManager {
             sb.append("Type \"").append(current.getKey()).append("\" to ").append(current.getValue()).append("\n");
         }
         return sb.toString();
-        /*return "Type \"add account\" to make a new account"
-                + "\nType \"add transaction\" to add a transaction to the current active account"
-                + "\nType \"change\" to change the active account"
-                + "\nType \"delete account\" to delete an account"
-                + "\nType \"delete transaction\" to delete a transaction from the current active account"
-                + "\nType \"display account\" to display all currently loaded accounts"
-                + "\nType \"display transaction\" to display all transactions for the current active account"
-                + "\nType \"quit\" to terminate the program"
-                + "\nType \"sort\" to sort the transactions for the current active account";*/
     }
 
     private void setActiveAccount(String accountName) throws AccountNotFoundException {

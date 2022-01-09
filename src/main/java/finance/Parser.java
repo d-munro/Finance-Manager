@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+//TODO - Parse user requests
 
 package finance;
 
@@ -11,5 +7,21 @@ package finance;
  * @author Dylan Munro
  */
 public class Parser {
-
+    
+    public Request generateRequest() {
+        Request request = null;
+        //TODO
+        return request;
+    }
+    
+    public void parseActionWord(String action) {
+        String[] words = action.split(" ");
+        if (words.length == 1) {
+            //request objectToModify = NONE
+        } else if (words.length == 2 && words[1].compareToIgnoreCase("account") == 0) {
+            //request objectToModify = ACCOUNT
+        } else if (words.length == 2 && words[1].compareToIgnoreCase("transaction") == 0) {
+            //request objectToModify = TRANSACTION
+        }
+    }
 }

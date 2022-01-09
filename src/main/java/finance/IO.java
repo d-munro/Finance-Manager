@@ -24,35 +24,11 @@ import java.util.Scanner;
  */
 public class IO {
 
-    private AccountManager manager = new AccountManager();
+    private final AccountManager manager = new AccountManager();
+    private final Parser parser = new Parser();
 
-    /**
-     * Creates a new account if desired
-     *
-     * @param input The Scanner reading the user's input
-     */
-    /*public void createAccount(Scanner input) {
-        String name;
-        System.out.println("Enter the name of the account");
-        name = input.nextLine();
-        manager.addAccount(new Account(name));
-    }*/
-    /**
-     * Displays all options that a user can choose to display info
-     */
-    /*public void displayOptions() {
-        System.out.println("Type create to make a new account");
-        System.out.println("Type delete to delete an account");
-        System.out.println("Type edit to modify the transactions for the current account");
-        System.out.println("Type history to display all previous transactions"
-                + " for the current account");
-        System.out.println("Type open to open a new account");
-        System.out.println("Type quit to terminate the program");
-        System.out.println("Type sort to sort account transactions");
-        System.out.println("Type display accounts to display all accounts loaded");
-    }*/
-
-    private void editAccount(Scanner input) throws NumberFormatException{
+    private String getTransactionDetails(Scanner input) throws AccountNotFoundException, InvalidInputException{
+        String output = "";
         String cont;
         String name;
         double fee;
@@ -67,13 +43,9 @@ public class IO {
             fee = getDouble(input, "Enter the cost of the item");
             quantity = (int)getDouble(input, "Enter the quantity of the item purchased");           
             cont = getYesOrNoResponse("Would you like to add a transaction to the account? (Yes/No)", input);
-            try {
-              manager.executeRequest(new Request("add transaction"));                
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
+            output = manager.executeRequest(new Request("add transaction"));  
         } while (cont.compareToIgnoreCase("no") != 0);
-        
+        return output;
     }
     
     /**
@@ -295,7 +267,7 @@ public class IO {
             System.out.println(AccountManager.getHelp());
             userChoice = input.nextLine();
             try {
-                currentRequest = new Request(userChoice, getAccountRequestParameters(userChoice, input));
+                currentRequest = new Request(userChoice, getRequestArgs(userChoice, input));
                 output = manager.executeRequest(currentRequest);
                 System.out.println(output + "\n");
             } catch (InvalidInputException | AccountNotFoundException e) {

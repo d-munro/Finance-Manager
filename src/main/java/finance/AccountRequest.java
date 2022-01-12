@@ -1,47 +1,29 @@
-//TODO - Refactor Constructor so only action and data is required
-
 package finance;
 
 /**
- *
+ * Generates an AccountRequest object which can be executed to modify an account. 
+ * The AccountRequest object contains all relevant details about the account
  * @author Dylan Munro
  */
 public class AccountRequest extends Request{
 
-    private Account data;
+    private final String accountName;
     
     /**
      * Constructor
      *
      * @param action The keyword describing how the user wishes to change the
      * account
-     * @param args The account which the action is acting upon
-     * @param data The account being acted upon
-     *
-     * @throws InvalidInputException
-     */        
-    public AccountRequest(String action, String args, Account data) throws InvalidInputException {
-        super(action, args);
-        this.data = data;
-    }
-    
-    /**
-     * Constructor
-     *
-     * @param action The keyword describing how the user wishes to change the
-     * account
-     * @param args Specifies the object or method describing what the action is
-     * performed on
      * @param accountName The name of the account
      *
      * @throws InvalidInputException
      */        
-    public AccountRequest(String action, String args, String accountName) throws InvalidInputException {
-        super(action, args);
-        this.data = new Account(accountName);
+    public AccountRequest(String action, String accountName) throws InvalidInputException {
+        super(action, accountName);
+        this.accountName = accountName;
     }
     
-    public Account getData() {
-        return data;
+    public String getAccountName() {
+        return accountName;
     }
 }

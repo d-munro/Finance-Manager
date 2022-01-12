@@ -2,20 +2,23 @@
 Display a meaningful message if user enters an invalid filepath
     (No valid json file is present at location)
 Don't put account prompting in load
-Check if requests containing args are for accounts or classes
-Rewrite to work with new Request implementation
+Implement generateDate();
  */
 package finance;
 
 //imports
+//simple json parser imports
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+//io imports
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+
+import java.util.Date;
 
 /**
  * Handles all input and output for the finance package
@@ -26,27 +29,6 @@ public class IO {
 
     private final AccountManager manager = new AccountManager();
     private final Parser parser = new Parser();
-
-    private String getTransactionDetails(Scanner input) throws AccountNotFoundException, InvalidInputException{
-        String output = "";
-        String cont;
-        String name;
-        double fee;
-        String category;
-        int quantity;
-        do {
-            System.out.println("Enter the name of the item");
-            name = input.nextLine();
-            System.out.println("Enter the category of the item");
-            category = input.nextLine();
-            System.out.println("Enter the cost of the item");
-            fee = getDouble(input, "Enter the cost of the item");
-            quantity = (int)getDouble(input, "Enter the quantity of the item purchased");           
-            cont = getYesOrNoResponse("Would you like to add a transaction to the account? (Yes/No)", input);
-            output = manager.executeRequest(new Request("add transaction"));  
-        } while (cont.compareToIgnoreCase("no") != 0);
-        return output;
-    }
     
     /**
      * Obtains a double from a prompt with exception checking
@@ -68,7 +50,28 @@ public class IO {
         }
         return response;
     }
-
+    
+    /**
+     * Obtains an int from a prompt with exception checking
+     * @param input The Scanner reading the user's input
+     * @param prompt The question to prompt the user with
+     * @return A valid int
+     */
+    public int getInt(Scanner input, String prompt) {
+        int response = 0;
+        boolean isValidResponse = false;
+        while (!isValidResponse) {
+            try {
+                System.out.println(prompt);
+                response = input.nextInt();
+                isValidResponse = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter an integer");
+            }           
+        }
+        return response;
+    }
+    
     /**
      * Obtains the path from the user to the JSON file with account details
      *
@@ -99,41 +102,69 @@ public class IO {
      * @return String containing necessary parameters to initialize a request
      * object
      */
-    private String getRequestArgs(String requestChoice, Scanner input) {
-        String params = null;
-        switch (requestChoice) { //Handles cases where multiple parameters are needed
+    private AccountRequest getAccountRequest(String action, Scanner input) throws InvalidInputException {
+        AccountRequest request = null;
+        String userInput;
+        switch (action) { //Handles cases where multiple parameters are needed
             case "add account":
                 System.out.println("Enter the name of the account:");
-                params = input.nextLine();
                 break;
-            case "change":
-                params = input.nextLine();
+            case "change account":
+                System.out.println("Enter the name of the account to change to");
                 break;
             case "delete account":
                 System.out.println("Enter the name of the account to delete:");
-                params = input.nextLine();
-                break;
-            /*case "history":
-                System.out.println("");
-                break;*/
-            case "open":
-                System.out.println("Enter the name of the account to open");
-                params = input.nextLine();
-                break;
-            /*case "quit":
-                System.out.println("");
-                break;*/
-            case "sort":
-                System.out.println("Enter 1 to sort the "
-                        + "transactions chronologically");
-                System.out.println("Enter 2 to sort the "
-                        + "transactions by cost");
-                System.out.println("Enter 3 to sort the "
-                        + "transactions by category");
-                params = input.nextLine();
                 break;
         }
-        return params;
+        userInput = input.nextLine();
+        request = new AccountRequest(action, userInput);
+        return request;
+    }
+    
+    private TransactionRequest getTransactionRequest(String action, Scanner input) throws InvalidInputException {
+        TransactionRequest request = null;
+        switch(action) {
+            case "add transaction":
+                System.out.println("Enter the name of the item");
+                String itemName = input.nextLine();
+                System.out.println("Enter the category of the item");
+                String itemCategory = input.nextLine();
+                System.out.println("Enter the cost of the item");
+                double itemFee = getDouble(input, "Enter the fee associated with the item");
+                int quantity = getInt(input, "Enter the quantity of the item purchased");
+                Date purchaseDate = generateDate(input, 
+                        "Enter the date of the transaction (yyyy-mm-dd)");
+                request = new TransactionRequest(action, itemName, itemFee,
+                    itemCategory, purchaseDate, quantity);
+                break;
+            case "delete transaction":
+                printTransactions();
+                int transactionNum = getInt(input,
+                        "Enter the number of the transaction you wish to delete");
+                request = new TransactionRequest(action, transactionNum);
+                break;
+            case "sort transaction":
+                String prompt = "Enter 1 to sort the transactions chronologically"
+                        + "\nEnter 2 to sort the transactions by cost"
+                        + "\nEnter 3 to sort the transactions by category";
+                int sortingMethod = getInt(input, prompt);
+                request = new TransactionRequest(action, sortingMethod);
+                break;
+            default:
+                throw new InvalidInputException("The specified action could not be found\n");
+        }
+        return request;
+    }
+    
+    /**
+     * Generates a date given a prompt and checks if the date is legitimate
+     * @param input The Scanner which input is being read from
+     * @param prompt The question being asked to the user
+     */
+    private Date generateDate(Scanner input, String prompt) {
+        Date date = new Date();
+        
+        return date;
     }
 
     /**
@@ -251,6 +282,13 @@ public class IO {
         ioHandler.load(input);
         ioHandler.run(input);
     }
+    
+    /**
+     * Prints all transactions for the account selected in the account manager
+     */
+    public void printTransactions() {
+        
+    }
 
     /**
      * Main method used for running the program
@@ -267,7 +305,17 @@ public class IO {
             System.out.println(AccountManager.getHelp());
             userChoice = input.nextLine();
             try {
-                currentRequest = new Request(userChoice, getRequestArgs(userChoice, input));
+                switch (parser.getActionObject(userChoice)) {
+                    case Request.ACCOUNT:
+                        currentRequest = getAccountRequest(userChoice, input);
+                        break;
+                    case Request.TRANSACTION:
+                        currentRequest = getTransactionRequest(userChoice, input);
+                        break;
+                    default:
+                        currentRequest = parser.generateSimpleRequest(userChoice);
+                        break;
+                }
                 output = manager.executeRequest(currentRequest);
                 System.out.println(output + "\n");
             } catch (InvalidInputException | AccountNotFoundException e) {

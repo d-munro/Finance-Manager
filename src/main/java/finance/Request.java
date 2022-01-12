@@ -1,4 +1,8 @@
-//TODO - Refactor Constructor so only action and data is required in subclasses
+/*
+TODO
+Refactor Constructor so only action and data is required in subclasses
+Store action and specification as int constants
+*/
 package finance;
 
 //imports
@@ -26,16 +30,16 @@ public class Request {
         ONE_PARAM_ACTION_DESCRIPTIONS = new HashMap<String, String>();
         ONE_PARAM_ACTION_DESCRIPTIONS.put("help", "add a transaction to the current active account");
         ONE_PARAM_ACTION_DESCRIPTIONS.put("quit", "terminate the program");
+        ONE_PARAM_ACTION_DESCRIPTIONS.put("display account", "display all currently loaded accounts");
+        ONE_PARAM_ACTION_DESCRIPTIONS.put("display transaction", "display all transactions for the current active account");
 
         TWO_PARAM_ACTION_DESCRIPTIONS = new HashMap<String, String>();
         TWO_PARAM_ACTION_DESCRIPTIONS.put("add account", "make a new account");
         TWO_PARAM_ACTION_DESCRIPTIONS.put("add transaction", "add a transaction to the current active account");
-        TWO_PARAM_ACTION_DESCRIPTIONS.put("change", "change the active account");
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("change account", "change the active account");
         TWO_PARAM_ACTION_DESCRIPTIONS.put("delete account", "delete an account");
         TWO_PARAM_ACTION_DESCRIPTIONS.put("delete transaction", "delete a transaction from the current active account");
-        TWO_PARAM_ACTION_DESCRIPTIONS.put("display account", "display all currently loaded accounts");
-        TWO_PARAM_ACTION_DESCRIPTIONS.put("display transaction", "display all transactions for the current active account");
-        TWO_PARAM_ACTION_DESCRIPTIONS.put("sort", "sort the transactions for the current active account");
+        TWO_PARAM_ACTION_DESCRIPTIONS.put("sort transaction", "sort the transactions for the current active account");
     }
 
     /**

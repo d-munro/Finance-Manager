@@ -93,7 +93,7 @@ public class AccountManager {
     }
 
     public String executeRequest(Request request)
-            throws AccountNotFoundException, InvalidInputException {
+            throws AccountNotFoundException, InvalidRequestException {
         String output = "";
         /*switch (request.getAction()) {
             case "add account":
@@ -137,13 +137,13 @@ public class AccountManager {
                 output = executeSortRequest((SortingRequest)request);
                 break;
             default:
-                throw new InvalidInputException("Request \"" + request.getAction()
+                throw new InvalidRequestException("Request \"" + request.getAction()
                         + "\" is not recognized");
         }*/
         return output;
     }
 
-    private String executeSortRequest(SortingRequest request) throws InvalidInputException {
+    private String executeSortRequest(SortingRequest request) throws InvalidRequestException {
         return activeAccount.setSortingMethod(request.getSortingMethod());
     }
 

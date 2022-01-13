@@ -1,8 +1,7 @@
 //TODO move the value (cost) of item to the Item class
 package finance;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
@@ -15,37 +14,42 @@ import org.json.simple.JSONArray;
 public class Transaction {
 
     private Item item;
-    private double quantity;
-    private Date date;
+    private int quantity;
+    private LocalDate date;
     private int id;
 
     /**
-     * Constructor for the Transaction class By default, the date of the
-     * transaction is the current date
-     *
-     * @param item The physical object which caused the transaction to take
-     * place
-     */
-    public Transaction(Item item) {
-        this(item, new Date()); //Default date is current date
-    }
-    
-    public Transaction(Item item, Date date) {
-        this(item, date, 1);
-    }
-
-    /**
-     * Constructor for the transaction class
+     * Creates a Transaction which contains various information about a purchase
      *
      * @param item The physical object which caused the transaction to take
      * place
      * @param date Describes when the transaction occurred
      * @param quantity The quantity of items purchased
+     * @param id An identifier used to refer to the transaction
      */
-    public Transaction(Item item, Date date, int quantity) {
+    public Transaction(Item item, LocalDate date, int quantity, int id) {
         this.item = item;
         this.date = date;
         this.quantity = quantity;
+        this.id = id;
+    }
+    
+    /**
+     * Creates a Transaction which contains various information about a purchase
+     * 
+     * @param itemName The name of the item purchased
+     * @param itemFee The fee associated with the item purchased
+     * @param itemCategory The broad category describing the item purchased
+     * @param date The date of the purchase
+     * @param quantity The number of items purchased
+     * @param id An identifier used to refer to the transaction
+     */
+    public Transaction(String itemName, double itemFee, String itemCategory,
+            LocalDate date, int quantity, int id) {
+        this.item = new Item(itemFee, itemName, itemCategory);
+        this.date = date;
+        this.quantity = quantity;
+        this.id = id;
     }
 
     /**
@@ -64,9 +68,9 @@ public class Transaction {
 
         //process the date of transaction
         if (obj.get("date") == null) {
-            this.date = new Date();
+            this.date = LocalDate.now();
         } else {
-            this.date = new Date((String) obj.get("date"));
+            this.date = LocalDate.parse((String) obj.get("date"));
         }
     }
 
@@ -81,12 +85,12 @@ public class Transaction {
     }
 
     /**
-     * The date describes when the transaction was created. It is in the format
-     * year-month-day.
+     * The date describes when the transaction was created. It is in the format 
+     * yyyy-MM-dd
      *
      * @return The date of the transaction
      */
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
     
@@ -100,13 +104,23 @@ public class Transaction {
     }
     
     /**
+     * The quantity describes the number of items purchased in the transaction
+     * 
+     * @return The quantity of items purchased in the transaction
+     */
+    public int getQuantity() {
+        return quantity;
+    }
+    
+    /**
      * @return The cost and date of the transaction formatted as a string
      */
     @Override
     public String toString() {
         return "-----------Transaction----------"
                 + "\n" + item
-                + "\nDate: " + new SimpleDateFormat("yyyy-MM-dd").format(date);
+                + "\nDate: " + date
+                + "\nId: " + id;
     }
 
 }

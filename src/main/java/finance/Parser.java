@@ -1,59 +1,128 @@
-//TODO - Parse user requests
-
 package finance;
 
 //imports
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Creates a parser object to generate requests from user commands
+ *
  * @author Dylan Munro
  */
 public class Parser {
-    
+
     /**
-     * Generates a request dealing with an account
-     * @return 
+     * Generates a Request which describes an action for the AccountManager to take
+     *
+     * @param action The action word describing the Request
+     * 
+     * @throws InvalidRequestException
+     *
+     * @return The created Request object
      */
-    public Request generateSimpleRequest(String action) throws InvalidInputException{
-        Request request = new AccountRequest(action, "dylan");
-        return request;
+    public Request generateRequest(String action) throws InvalidRequestException {
+        return new Request(action);
     }
-    
-    public AccountRequest generateAccountRequest(String action, String accountName) throws InvalidInputException {
-        AccountRequest request = new AccountRequest(action, accountName);
-        return request;
-    }
-    
+
     /**
-     * Generates a request dealing with a transaction
+     * Generates an AccountRequest which describes an action for the AccountManager 
+     * to take concerning the details of an account
+     *
+     * @param action The action word describing the Request
+     * @param accountName The name of the account
+     *
+     * @return The created AccountRequest object
+     *
+     * @throws InvalidRequestException
+     *
+     */
+    public AccountRequest generateAccountRequest(String action, String accountName) throws InvalidRequestException {
+        return new AccountRequest(action, accountName);
+    }
+    
+
+    /**
+     * Generates an AccountRequest which describes the details of an account
+     *
+     * @param action The action word describing the Request
+     * @param accountId The unique identifier referring to the account
+     *
+     * @return The created AccountRequest object
+     *
+     * @throws InvalidRequestException
+     *
+     */
+    public AccountRequest generateAccountRequest(String action, int accountId) 
+            throws InvalidRequestException {
+        return new AccountRequest(action, accountId);
+    }
+    
+
+    /**
+     * Generates a TransactionRequest which describes the details and modifications of a transaction
+     *
      * @param action The keyword describing how the user wishes to change the
      * transaction
      * @param itemName The name of the item involved in the transaction
-     * @param itemFee The fee associated with the item involved in the transaction
-     * @param itemCategory The broad category which the item involved in the transaction belongs to
+     * @param itemFee The fee associated with the item involved in the
+     * transaction
+     * @param itemCategory The broad category which the item involved in the
+     * transaction belongs to
      * @param date The date of the transaction
      * @param quantity The number of items involved in the transaction
-     * 
-     * @throws InvalidInputException
-     * 
+     *
+     * @throws InvalidRequestException
+     *
      * @return New TransactionRequest object
      */
     public TransactionRequest generateTransactionRequest(String action, String itemName, double itemFee,
-            String itemCategory, Date date, int quantity) throws InvalidInputException {
-        TransactionRequest request = new TransactionRequest(action, itemName, 
-            itemFee, itemCategory, date, quantity);
-        return request;
+            String itemCategory, LocalDate date, int quantity) throws InvalidRequestException {
+        return new TransactionRequest(action, itemName,
+                itemFee, itemCategory, date, quantity);
     }
     
     /**
-     * Parses an action word and determines if it relates to an account, transaction, or neither
-     * @param action The action word to be parsed
-     * @return Request.ACCOUNT if action relates to an account, 
-     * Request.TRANSACTION if action relates to a transaction 
-     * Request.NONE if action relates to neither
+     * Generates a TransactionRequest which describes the details and modifications of a transaction
+     *
+     * @param action The keyword describing how the user wishes to change the
+     * transaction
+     * @param transactionId The unique identifier referring to the transaction
+     *
+     * @throws InvalidRequestException
+     *
+     * @return New TransactionRequest object
      */
-    public int getActionObject(String action) throws InvalidInputException {
+    public TransactionRequest generateTransactionRequest(String action, int transactionId)
+            throws InvalidRequestException {
+        return new TransactionRequest(action, transactionId);
+    }
+        
+    /**
+     * Generates a SortingRequest to sort transactions in various ways
+     * 
+     * @param action The action word describing the SortingRequest
+     * @param sortingMethod The method of which transactions are to be sorted
+     * 
+     * @throws InvalidRequestException
+     * 
+     * @return The SortingRequest object describing the sorting method
+     */
+    public SortingRequest generateSortingRequest(String action, int sortingMethod) throws InvalidRequestException {
+        return new SortingRequest(action, sortingMethod);
+    }
+
+    /**
+     * Parses an action word and determines if it relates to an account,
+     * transaction, or neither
+     *
+     * @param action The action word to be parsed
+     * 
+     * @throws InvalidRequestException
+     * 
+     * @return Request.ACCOUNT if action relates to an account,
+     * Request.TRANSACTION if action relates to a transaction Request.NONE if
+     * action relates to neither
+     */
+    public int getActionObject(String action) throws InvalidRequestException {
         String[] words = action.split(" ");
         if (words.length == 1) {
             return Request.NONE;
@@ -62,6 +131,6 @@ public class Parser {
         } else if (words.length == 2 && words[1].compareToIgnoreCase("transaction") == 0) {
             return Request.TRANSACTION;
         }
-        throw new InvalidInputException("Request not recongized");
+        throw new InvalidRequestException("Request not recongized");
     }
 }

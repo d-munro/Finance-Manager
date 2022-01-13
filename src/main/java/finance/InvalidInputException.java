@@ -1,7 +1,7 @@
 package finance;
 
 /**
- * Creates an exception which indicates that unexpected input occurred
+ * Creates an exception which indicates that unexpected user input occurred
  *
  * @author Dylan Munro
  */

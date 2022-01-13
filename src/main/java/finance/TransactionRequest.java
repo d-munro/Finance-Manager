@@ -1,7 +1,7 @@
 package finance;
 
 //imports
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Generates an TransactionRequest object which can be executed to add or delete a transaction to or from an account.
@@ -14,7 +14,7 @@ public class TransactionRequest extends Request{
     private String itemName;
     private double itemFee;
     private String itemCategory;
-    private Date date;
+    private LocalDate date;
     private int quantity;
     
     //Details for deleting a transaction
@@ -31,10 +31,10 @@ public class TransactionRequest extends Request{
      * @param date The date of the transaction
      * @param quantity The number of items involved in the transaction
      *
-     * @throws InvalidInputException
+     * @throws InvalidRequestException
      */        
     public TransactionRequest(String action, String itemName, double itemFee,
-            String itemCategory, Date date, int quantity) throws InvalidInputException {
+            String itemCategory, LocalDate date, int quantity) throws InvalidRequestException {
         super(action, true);
         this.itemName = itemName;
         this.itemFee = itemFee;
@@ -66,7 +66,7 @@ public class TransactionRequest extends Request{
         return itemCategory;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -74,6 +74,10 @@ public class TransactionRequest extends Request{
         return quantity;
     }
     
+    /**
+     * 
+     * @return The unique identifier referencing the Transaction
+     */
     public int getId() {
         return id;
     }

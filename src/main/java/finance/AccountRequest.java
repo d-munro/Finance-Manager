@@ -18,14 +18,14 @@ public class AccountRequest extends Request{
      * account
      * @param accountName The name of the account
      *
-     * @throws InvalidInputException
+     * @throws InvalidRequestException
      */        
-    public AccountRequest(String action, String accountName) throws InvalidInputException {
+    public AccountRequest(String action, String accountName) throws InvalidRequestException {
         super(action, true);
         this.accountName = accountName;
     }
     
-    public AccountRequest(String action, int id) throws InvalidInputException {
+    public AccountRequest(String action, int id) throws InvalidRequestException {
         super(action);
         this.id = id;
     }

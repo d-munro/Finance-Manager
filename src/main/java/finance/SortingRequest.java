@@ -29,12 +29,12 @@ public class SortingRequest extends Request{
      * account
      * @param sortingMethod The method of which transactions are to be sorted by
      *
-     * @throws InvalidInputException
+     * @throws InvalidRequestException
      */        
-    public SortingRequest(String action, int sortingMethod) throws InvalidInputException {
+    public SortingRequest(String action, int sortingMethod) throws InvalidRequestException {
         super(action, true);
         if (!VALID_SORTING_METHODS.containsKey(sortingMethod)) {
-            throw new InvalidInputException("Invalid sorting method.");
+            throw new InvalidRequestException("Invalid sorting method.");
         }
         this.sortingMethod = sortingMethod;
     }

@@ -2,7 +2,6 @@
 Display a meaningful message if user enters an invalid filepath
     (No valid json file is present at location)
 Don't put account prompting in load
-Implement generateDate();
  */
 package finance;
 
@@ -18,7 +17,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  * Handles all input and output for the finance package
@@ -94,15 +93,15 @@ public class IO {
     }
 
     /**
-     * Obtains all necessary user input to create a request object for an
-     * account
+     * Obtains all necessary user input to create an AccountRequest object 
+     * and creates it
      *
-     * @param requestChoice The user's decision as to what to do next
+     * @param action The action word describing the functionality of the Request
      * @param input The Scanner which user input is being read from
-     * @return String containing necessary parameters to initialize a request
-     * object
+     * 
+     * @return The newly created AccountRequest object
      */
-    private AccountRequest getAccountRequest(String action, Scanner input) throws InvalidInputException {
+    private AccountRequest getAccountRequest(String action, Scanner input) throws InvalidRequestException {
         AccountRequest request = null;
         String userInput;
         switch (action) { //Handles cases where multiple parameters are needed
@@ -120,10 +119,39 @@ public class IO {
         request = new AccountRequest(action, userInput);
         return request;
     }
+
+    /**
+     * Obtains all necessary user input to create an SortingRequest object 
+     * and creates it
+     *
+     * @param action The action word describing the functionality of the Request
+     * @param input The Scanner which user input is being read from
+     * 
+     * @return The newly created SortingRequest object
+     */
+    private SortingRequest getSortingRequest(String action, Scanner input) 
+            throws InvalidRequestException {
+        String prompt = "Enter 1 to sort the transactions chronologically"
+            + "\nEnter 2 to sort the transactions by cost"
+            + "\nEnter 3 to sort the transactions by category";
+        int sortingMethod = getInt(input, prompt);
+        SortingRequest request = new SortingRequest(action, sortingMethod);
+        return request;
+    }
     
-    private TransactionRequest getTransactionRequest(String action, Scanner input) throws InvalidInputException {
+    /**
+     * Obtains all necessary user input to create an TransactionRequest object 
+     * and creates it
+     *
+     * @param action The action word describing the functionality of the Request
+     * @param input The Scanner which user input is being read from
+     * 
+     * @return The newly created TransactionRequest object
+     */    
+    private TransactionRequest getTransactionRequest(String action, Scanner input) 
+            throws InvalidRequestException, AccountNotFoundException {
         TransactionRequest request = null;
-        switch(action) {
+        switch (action) {
             case "add transaction":
                 System.out.println("Enter the name of the item");
                 String itemName = input.nextLine();
@@ -132,16 +160,17 @@ public class IO {
                 System.out.println("Enter the cost of the item");
                 double itemFee = getDouble(input, "Enter the fee associated with the item");
                 int quantity = getInt(input, "Enter the quantity of the item purchased");
-                Date purchaseDate = generateDate(input, 
-                        "Enter the date of the transaction (yyyy-mm-dd)");
+                LocalDate purchaseDate = getDate(input, 
+                        "Enter the date of the transaction (yyyy-mm-dd)."
+                                + "\nAlternatively, enter \"today\" if the item was purchased today");
                 request = new TransactionRequest(action, itemName, itemFee,
                     itemCategory, purchaseDate, quantity);
                 break;
             case "delete transaction":
                 printTransactions();
-                int transactionNum = getInt(input,
-                        "Enter the number of the transaction you wish to delete");
-                request = new TransactionRequest(action, transactionNum);
+                int transactionId = getInt(input,
+                        "Enter the id of the transaction you wish to delete");
+                request = new TransactionRequest(action, transactionId);
                 break;
             case "sort transaction":
                 String prompt = "Enter 1 to sort the transactions chronologically"
@@ -151,7 +180,7 @@ public class IO {
                 request = new TransactionRequest(action, sortingMethod);
                 break;
             default:
-                throw new InvalidInputException("The specified action could not be found\n");
+                throw new InvalidRequestException("The specified action could not be found\n");
         }
         return request;
     }
@@ -161,10 +190,38 @@ public class IO {
      * @param input The Scanner which input is being read from
      * @param prompt The question being asked to the user
      */
-    private Date generateDate(Scanner input, String prompt) {
-        Date date = new Date();
-        
+    private LocalDate getDate(Scanner input, String prompt) {
+        LocalDate date = LocalDate.now();
+        boolean isValid = false;
+        String userInput;
+        while (!isValid) {
+            try {
+                System.out.println(prompt);
+                userInput = input.nextLine();
+                date = generateDate(userInput);
+                isValid = true;
+            } catch (InvalidInputException | ParseException e) {
+                System.out.println(e.getMessage());
+            }
+        }
         return date;
+    }
+    
+    /**
+     * Generates a date from a String given in the form (yyyy-mm-dd). 
+     * Alternatively, if the String given is "today", the current date is generated. 
+     * 
+     * @param str The date formatted as a string in the format (yyyy-mm-dd)
+     * 
+     * @throws InvalidInputException
+     * 
+     * @return A date object representing the input String
+     */
+    private LocalDate generateDate(String str) throws InvalidInputException, ParseException {
+        if (str.compareToIgnoreCase("today") == 0) {
+            return LocalDate.now();
+        }
+        return LocalDate.parse(str);
     }
 
     /**
@@ -235,9 +292,9 @@ public class IO {
      */
     private JSONObject loadAccountsJSON(BufferedReader inputStream) {
         JSONObject accountsJSON = null;
-        JSONParser parser = new JSONParser();
+        JSONParser jParser = new JSONParser();
         try {
-            accountsJSON = (JSONObject) parser.parse(inputStream);
+            accountsJSON = (JSONObject) jParser.parse(inputStream);
         } catch (ParseException | IOException e) {
             System.out.println(e.getMessage());
         }
@@ -285,9 +342,12 @@ public class IO {
     
     /**
      * Prints all transactions for the account selected in the account manager
+     * 
+     * @throws InvalidRequestException
      */
-    public void printTransactions() {
-        
+    public void printTransactions() throws InvalidRequestException, AccountNotFoundException {
+        System.out.println("Here are all transactions for the current account:");
+        System.out.println(manager.executeRequest(parser.generateRequest("display")));
     }
 
     /**
@@ -312,27 +372,20 @@ public class IO {
                     case Request.TRANSACTION:
                         currentRequest = getTransactionRequest(userChoice, input);
                         break;
+                    case Request.SORTING:
+                        currentRequest = getSortingRequest(userChoice, input);
+                        break;
                     default:
-                        currentRequest = parser.generateSimpleRequest(userChoice);
+                        currentRequest = parser.generateRequest(userChoice);
                         break;
                 }
                 output = manager.executeRequest(currentRequest);
                 System.out.println(output + "\n");
-            } catch (InvalidInputException | AccountNotFoundException e) {
+            } catch (InvalidRequestException | AccountNotFoundException e) {
                 System.out.println(e.getMessage() + "\n");
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number");
             }
         }
     }
-
-    public void selectAccount(Scanner input) throws AccountNotFoundException {
-        System.out.println("The accounts currently loaded are:");
-        for (String current : manager.getAccountNames()) {
-            System.out.println(current);
-        }
-        System.out.println("Enter an account to view:");
-        //manager.setActiveAccount(input.nextLine());
-    }
-
 }

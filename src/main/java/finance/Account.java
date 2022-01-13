@@ -3,6 +3,7 @@ package finance;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.HashMap;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
@@ -17,12 +18,10 @@ public class Account {
 
     //constants
     private final String name;
-    public static final int SORTED_CHRONOLOGICALLY = 1;
-    public static final int SORTED_BY_COST = 2;
-    public static final int SORTED_BY_CATEGORY = 3;
 
     private int sortingMethod;
     private LinkedList<Transaction> transactions = new LinkedList<>();
+    private int id;
 
     /**
      * Constructor for the Account class
@@ -72,17 +71,12 @@ public class Account {
     }
     
     /**
-     * Determines if the desired method of being sorted is recognized by Account
+     * The accounts id is an identifier used to reference the account
      * 
-     * @param sortingMethod The requested method of being sorted. sortingMethod
-     * should either equal the constant SORTED_CHRONOLOGICALLY (1),
-     * SORTED_BY_COST (2), or SORTED_BY_CATEGORY (3)
-     * @return true if the sortingMethod is valid, false if invalid
+     * @return The account id
      */
-    public boolean isValidSortingMethod(int sortingMethod) {
-        return sortingMethod == SORTED_CHRONOLOGICALLY
-                || sortingMethod == SORTED_BY_COST
-                || sortingMethod == SORTED_BY_CATEGORY;
+    public int getId() {
+        return id;
     }
 
     /**
@@ -132,9 +126,11 @@ public class Account {
 
     }
 
-    public void setSortingMethod(int method) {
+    public String setSortingMethod(int method) {
+        String returnedText = "";
+        /*HashMap<Integer, Boolean> SORTING_METHODS = SortingRequest.getVALID_SORTING_METHODS();
         switch (method) {
-            case SORTED_CHRONOLOGICALLY:
+            case SORTING_METHODS.getKey(SORTED_CHRONOLOGICALLY):
                 sortChronologically();
                 sortingMethod = SORTED_CHRONOLOGICALLY;
             case SORTED_BY_CATEGORY:
@@ -143,7 +139,8 @@ public class Account {
             case SORTED_BY_COST:
                 sortByCost();
                 sortingMethod = SORTED_BY_COST;
-        }
+        }*/
+        return returnedText;
     }
 
 }

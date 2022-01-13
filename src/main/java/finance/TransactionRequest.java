@@ -1,4 +1,3 @@
-//TODO Distinguish between sortingMethod and transactionNumber in constructor
 package finance;
 
 //imports
@@ -11,10 +10,6 @@ import java.util.Date;
  */
 public class TransactionRequest extends Request{
     
-    //Constants
-    public static final int NUM_CLASSIFICATION_SORT = 1;
-    public static final int NUM_CLASSIFICATION_DELETE = 2;
-
     //Details for creating a new transaction
     private String itemName;
     private double itemFee;
@@ -22,14 +17,11 @@ public class TransactionRequest extends Request{
     private Date date;
     private int quantity;
     
-    //Method of sorting the transactions
-    private int sortingMethod;
-    
-    //Transaction number to be deleted if deleting a transaction
-    private int transactionNumber;
+    //Details for deleting a transaction
+    private int id;
     
     /**
-     * Constructor
+     * Generates a Request capable of building a new Transaction
      *
      * @param action The keyword describing how the user wishes to change the
      * transaction
@@ -43,7 +35,7 @@ public class TransactionRequest extends Request{
      */        
     public TransactionRequest(String action, String itemName, double itemFee,
             String itemCategory, Date date, int quantity) throws InvalidInputException {
-        super(action, itemName);
+        super(action, true);
         this.itemName = itemName;
         this.itemFee = itemFee;
         this.itemCategory = itemCategory;
@@ -51,9 +43,15 @@ public class TransactionRequest extends Request{
         this.quantity = quantity;
     }
     
-    public TransactionRequest(String action, int number) throws InvalidInputException {
-        super(action);
-        this.transactionNumber = number;
+    /**
+     * Generates a Request capable of deleting a Transaction
+     *
+     * @param action The keyword describing how the user wishes to change the
+     * transaction
+     * @param id A unique identifier used to reference the transaction
+     */
+    public TransactionRequest(String action, int id) {
+        this.id = id;
     }
 
     public String getItemName() {
@@ -76,7 +74,7 @@ public class TransactionRequest extends Request{
         return quantity;
     }
     
-    public int getTransactionNumber() {
-        return transactionNumber;
+    public int getId() {
+        return id;
     }
 }

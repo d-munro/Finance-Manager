@@ -1,7 +1,7 @@
 /*--------------------------------TODO---------------------
 Correct getSpecification() methods in account/transaction requests
     -Either implement getSpecification() in appropriate classes, or change getSpecification() to getData()
-Complete delete, open, sort methods
+Refactor request execution methods to work with Request subclasses
 Be sure to check for instances where activeAccount = null
  */
 package finance;
@@ -30,8 +30,8 @@ public class AccountManager {
      * creation
      * @return Message indicating that account creation was successful
      */
-    private String executeAddAccountRequest(Request request) {
-        String accountName = request.getSpecification();
+    private String executeAddAccountRequest(AccountRequest request) {
+        String accountName = request.getAccountName();
         Account account = new Account(accountName);
         namesToAccounts.put(account.getName(), account);
         activeAccount = account;
@@ -39,9 +39,9 @@ public class AccountManager {
                 + "\n" + accountName + " is now the active account.";
     }
 
-    private String executeDeleteAccountRequest(Request request) throws AccountNotFoundException {
+    private String executeDeleteAccountRequest(AccountRequest request) throws AccountNotFoundException {
         StringBuilder returnedString = new StringBuilder();
-        if (namesToAccounts.isEmpty()) {
+        /*if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("There are currently no accounts loaded");
         }
         if (namesToAccounts.get(request.getSpecification()) == null) {
@@ -56,7 +56,7 @@ public class AccountManager {
         returnedString.append("The account \"").append(request.getSpecification()).append("\" has been deleted.");
         if (numOfAccountsLoaded == 1) {
             setActiveAccount(namesToAccounts.entrySet().iterator().next().getKey());
-        }
+        }*/
         return returnedString.toString();
     }
 
@@ -82,9 +82,10 @@ public class AccountManager {
         return sb.toString();
     }
 
-    private String executeChangeRequest(Request request) throws AccountNotFoundException {
-        setActiveAccount(request.getSpecification());
-        return request.getSpecification() + " is now the active account.";
+    private String executeChangeRequest(AccountRequest request) throws AccountNotFoundException {
+        /*setActiveAccount(request.getSpecification());
+        return request.getAccountName() + " is now the active account.";*/
+        return "DELETE THIS TEXT IN AccountManager.executeChangeRequest()";
     }
 
     private String executeQuitRequest() {
@@ -94,7 +95,7 @@ public class AccountManager {
     public String executeRequest(Request request)
             throws AccountNotFoundException, InvalidInputException {
         String output = "";
-        switch (request.getAction()) {
+        /*switch (request.getAction()) {
             case "add account":
                 System.out.println("add acc");
                 output = executeAddAccountRequest(request);
@@ -133,23 +134,17 @@ public class AccountManager {
                 break;
             case "sort":
                 System.out.println("sort");
-                output = executeSortRequest(request);
+                output = executeSortRequest((SortingRequest)request);
                 break;
             default:
                 throw new InvalidInputException("Request \"" + request.getAction()
                         + "\" is not recognized");
-        }
+        }*/
         return output;
     }
 
-    private String executeSortRequest(Request request) throws InvalidInputException {
-        //TODO Complete method
-        try {
-           activeAccount.setSortingMethod(Integer.parseInt(request.getSpecification()));           
-        } catch (NumberFormatException e) {
-            throw new InvalidInputException("Please enter 1, 2, or 3");
-        }
-        return "In sort";
+    private String executeSortRequest(SortingRequest request) throws InvalidInputException {
+        return activeAccount.setSortingMethod(request.getSortingMethod());
     }
 
     /**
@@ -199,10 +194,12 @@ public class AccountManager {
      */
     public static String getHelp() {
         StringBuilder sb = new StringBuilder();
-        for (HashMap.Entry<String, String> current : Request.ONE_PARAM_ACTION_DESCRIPTIONS.entrySet()) {
+        HashMap<String, String> map1 = Request.getONE_PARAM_ACTION_DESCRIPTIONS();
+        HashMap<String, String> map2 = Request.getTWO_PARAM_ACTION_DESCRIPTIONS();
+        for (HashMap.Entry<String, String> current : map1.entrySet()) {
             sb.append("Type \"").append(current.getKey()).append("\" to ").append(current.getValue()).append("\n");
         }
-        for (HashMap.Entry<String, String> current : Request.TWO_PARAM_ACTION_DESCRIPTIONS.entrySet()) {
+        for (HashMap.Entry<String, String> current : map2.entrySet()) {
             sb.append("Type \"").append(current.getKey()).append("\" to ").append(current.getValue()).append("\n");
         }
         return sb.toString();

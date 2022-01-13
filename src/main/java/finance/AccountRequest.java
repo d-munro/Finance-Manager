@@ -7,7 +7,9 @@ package finance;
  */
 public class AccountRequest extends Request{
 
-    private final String accountName;
+    private String accountName;
+    
+    private int id;
     
     /**
      * Constructor
@@ -19,11 +21,20 @@ public class AccountRequest extends Request{
      * @throws InvalidInputException
      */        
     public AccountRequest(String action, String accountName) throws InvalidInputException {
-        super(action, accountName);
+        super(action, true);
         this.accountName = accountName;
+    }
+    
+    public AccountRequest(String action, int id) throws InvalidInputException {
+        super(action);
+        this.id = id;
     }
     
     public String getAccountName() {
         return accountName;
+    }
+    
+    public int getId() {
+        return id;
     }
 }

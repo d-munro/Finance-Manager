@@ -17,6 +17,7 @@ public class Transaction {
     private Item item;
     private double quantity;
     private Date date;
+    private int id;
 
     /**
      * Constructor for the Transaction class By default, the date of the
@@ -88,7 +89,16 @@ public class Transaction {
     public Date getDate() {
         return date;
     }
-
+    
+    /**
+     * The id is an identifier used to reference the transaction
+     * 
+     * @return The transaction id
+     */
+    public int getId() {
+        return id;
+    }
+    
     /**
      * @return The cost and date of the transaction formatted as a string
      */

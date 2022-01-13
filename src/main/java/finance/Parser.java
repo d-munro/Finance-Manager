@@ -6,7 +6,7 @@ package finance;
 import java.util.Date;
 
 /**
- * Creates a parser object to parse all user commands
+ * Creates a parser object to generate requests from user commands
  * @author Dylan Munro
  */
 public class Parser {
@@ -16,7 +16,7 @@ public class Parser {
      * @return 
      */
     public Request generateSimpleRequest(String action) throws InvalidInputException{
-        Request request = new Request(action);
+        Request request = new AccountRequest(action, "dylan");
         return request;
     }
     

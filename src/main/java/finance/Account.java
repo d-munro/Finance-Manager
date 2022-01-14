@@ -21,7 +21,12 @@ public class Account {
 
     private int sortingMethod;
     private LinkedList<Transaction> transactions = new LinkedList<>();
-    private int id;
+    private HashMap<Long, Transaction> idToTransaction = new HashMap<Long, Transaction>();
+    
+    /*Keeps track of the total number of transactions added, without decreasing 
+    if a transaction is deleted. This gaurantees that every transaction will 
+    have a unique identifier to reference it*/
+    private long nextTransactionId;
 
     /**
      * Constructor for the Account class
@@ -30,6 +35,7 @@ public class Account {
      */
     public Account(String name) {
         this.name = name;
+        this.nextTransactionId = 0;
     }
 
     /**
@@ -40,6 +46,7 @@ public class Account {
      */
     public Account(JSONObject obj) throws CorruptJSONObjectException {
         this.name = obj.get("name").toString();
+        this.nextTransactionId = 0;
         initializeTransactions((JSONArray) obj.get("transactions"));
     }
 
@@ -50,7 +57,48 @@ public class Account {
      */
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction);
+        idToTransaction.put(transaction.getId(), transaction);
     }
+    
+    /**
+     * Determines if the account contains a transaction belonging to an id
+     * 
+     * @param transactionId The id belonging to the transaction
+     * @return true if the account contains a transaction with the id, 
+     * false otherwise
+     */
+    public boolean containsTransaction(long transactionId) {
+        return idToTransaction.containsKey(transactionId);
+    }
+    
+    /**
+     * Determines if the account contains any transactions
+     * 
+     * @return true if the account contains transactions, false otherwise
+     */
+    public boolean containsTransactions() {
+        return !transactions.isEmpty();
+    }
+    
+    public void deleteTransaction(long transactionId) throws TransactionNotFoundException {
+        if (transactions.isEmpty()) {
+            throw new TransactionNotFoundException(
+                    "No transactions have been made on the account \"" + name + "\"");
+        } else if (!containsTransaction(transactionId)) {
+            throw new TransactionNotFoundException(transactionId);
+        }
+        idToTransaction.remove(transactionId);
+    }
+    
+    /**
+     * Obtains a transaction associated with a specific transactionId
+     * 
+     * @param transactionId The transactionId of the transaction
+     * 
+     * @return The transaction associated with the given id
+     * 
+     * @throws TransactionNotFoundException
+     */
 
     /**
      * Returns a list of all transactions which have happened in the account
@@ -69,15 +117,6 @@ public class Account {
     public String getName() {
         return name;
     }
-    
-    /**
-     * The accounts id is an identifier used to reference the account
-     * 
-     * @return The account id
-     */
-    public int getId() {
-        return id;
-    }
 
     /**
      * Initializes all transactions for the account given a JSONObject of the
@@ -88,10 +127,20 @@ public class Account {
      * @throws CorruptJSONObjectException
      */
     private void initializeTransactions(JSONArray transactionsJSON) throws CorruptJSONObjectException {
-        JSONObject currentTransaction;
+        JSONObject currentTransactionJson;
+        Transaction currentTransaction;
         for (int i = 0; i < transactionsJSON.size(); i++) {
-            currentTransaction = (JSONObject) transactionsJSON.get(i);
-            transactions.add(new Transaction(currentTransaction));
+            currentTransactionJson = (JSONObject) transactionsJSON.get(i);
+            
+            /*Send nextTransactionId + 1 to new transaction rather than incrementing
+            This means that the id can still be used for next transaction 
+            if CorruptJSONObjectException is thrown*/
+            currentTransaction = new Transaction(currentTransactionJson, nextTransactionId + 1);
+            transactions.add(currentTransaction);
+            idToTransaction.put(nextTransactionId, currentTransaction);
+            
+            //Must increase nextTransactionId after adding the transaction in case of CorruptJSONObjectException
+            nextTransactionId++; 
         }
     }
 

@@ -19,6 +19,7 @@ import org.json.simple.JSONObject;
 public class AccountManager {
 
     private HashMap<String, Account> namesToAccounts = new HashMap<String, Account>();
+    private HashMap<Long, Transaction> idsToTransactions = new HashMap<Long, Transaction>();
     private Account activeAccount;
     private int numOfAccountsLoaded;
 
@@ -38,25 +39,35 @@ public class AccountManager {
         return "New account created with the name " + accountName + "."
                 + "\n" + accountName + " is now the active account.";
     }
+    
+    private String executeAddTransactionRequest(TransactionRequest request) 
+        throws AccountNotFoundException {
+        if (activeAccount == null) {
+            throw new AccountNotFoundException("Please select an active account before making a transaciton");
+        }
+        activeAccount.addTransaction(new Transaction(request.getItemName(), request.getItemFee(),
+            request.getItemCategory(), request.getDate(), request.getQuantity(), request.getId()));
+        return "The transaction has been added to the account \"" + activeAccount.getName() + "\"";
+    }
 
     private String executeDeleteAccountRequest(AccountRequest request) throws AccountNotFoundException {
         StringBuilder returnedString = new StringBuilder();
-        /*if (namesToAccounts.isEmpty()) {
+        if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("There are currently no accounts loaded");
         }
-        if (namesToAccounts.get(request.getSpecification()) == null) {
+        if (namesToAccounts.get(request.getAccountName()) == null) {
             throw new AccountNotFoundException("The account \""
-                    + request.getSpecification() + "\" does not exist");
+                    + request.getAccountName() + "\" does not exist");
         }
-        if (namesToAccounts.get(request.getSpecification()).equals(activeAccount)) {
+        if (namesToAccounts.get(request.getAccountName()).equals(activeAccount)) {
             activeAccount = null;
         }
-        namesToAccounts.remove(request.getSpecification());
+        namesToAccounts.remove(request.getAccountName());
         numOfAccountsLoaded--;
-        returnedString.append("The account \"").append(request.getSpecification()).append("\" has been deleted.");
+        returnedString.append("The account \"").append(request.getAccountName()).append("\" has been deleted.");
         if (numOfAccountsLoaded == 1) {
             setActiveAccount(namesToAccounts.entrySet().iterator().next().getKey());
-        }*/
+        }
         return returnedString.toString();
     }
 
@@ -68,12 +79,13 @@ public class AccountManager {
         return sb.toString();
     }
 
-    private String executeDisplayTransactionRequest() throws AccountNotFoundException {
+    private String executeDisplayTransactionRequest() throws
+            AccountNotFoundException, TransactionNotFoundException {
         if (activeAccount == null) {
             throw new AccountNotFoundException("No active account selected");
-        }
-        if (activeAccount.getTransactions().isEmpty()) {
-            return "No transactions have been made on the account.";
+        } else if (!activeAccount.containsTransactions()) {
+            throw new TransactionNotFoundException(
+                    "No transactions have been made on the account.");
         }
         StringBuilder sb = new StringBuilder();
         for (Transaction current : activeAccount.getTransactions()) {
@@ -81,11 +93,22 @@ public class AccountManager {
         }
         return sb.toString();
     }
+    
+    private String executeDeleteTransactionRequest(TransactionRequest request) throws 
+            AccountNotFoundException, TransactionNotFoundException {
+        long transactionId = request.getId();
+        if (activeAccount == null) {
+            throw new AccountNotFoundException("No active account selected");
+        } 
+        activeAccount.deleteTransaction(transactionId);
+        return "The transaction associated with the id " + transactionId
+                + " has been deleted";
+    }
 
     private String executeChangeRequest(AccountRequest request) throws AccountNotFoundException {
-        /*setActiveAccount(request.getSpecification());
-        return request.getAccountName() + " is now the active account.";*/
-        return "DELETE THIS TEXT IN AccountManager.executeChangeRequest()";
+        String activeAccountName = request.getAccountName();
+        setActiveAccount(activeAccountName);
+        return activeAccountName + " is now the active account.";
     }
 
     private String executeQuitRequest() {
@@ -93,53 +116,44 @@ public class AccountManager {
     }
 
     public String executeRequest(Request request)
-            throws AccountNotFoundException, InvalidRequestException {
+            throws AccountNotFoundException, InvalidRequestException, TransactionNotFoundException {
         String output = "";
-        /*switch (request.getAction()) {
+        System.out.println("In execute");
+        switch (request.getAction()) {
             case "add account":
-                System.out.println("add acc");
-                output = executeAddAccountRequest(request);
+                output = executeAddAccountRequest((AccountRequest)request);
                 break;
             case "add transaction":
-                System.out.println("add trans");
-                //output = executeAddTransactionRequest(request);
+                output = executeAddTransactionRequest((TransactionRequest)request);
                 break;
             case "change":
-                System.out.println("change");
-                output = executeChangeRequest(request);
+                output = executeChangeRequest((AccountRequest)request);
                 break;
             case "delete account":
-                System.out.println("delete account");
-                output = executeDeleteAccountRequest(request);
+                output = executeDeleteAccountRequest((AccountRequest)request);
                 break;
             case "delete transaction":
-                System.out.println("delete transaction");
-                //output = executeDeleteTransactionRequest(request);
+                output = executeDeleteTransactionRequest((TransactionRequest)request);
                 break;
             case "display account":
-                System.out.println("display account");
                 output = executeDisplayAccountRequest();
                 break;
             case "display transaction":
-                System.out.println("display transaction");
                 output = executeDisplayTransactionRequest();
                 break;
             case "help":
-                System.out.println("help");
                 output = getHelp();
                 break;
             case "quit":
-                System.out.println("quit");
                 output = executeQuitRequest();
                 break;
             case "sort":
-                System.out.println("sort");
                 output = executeSortRequest((SortingRequest)request);
                 break;
             default:
                 throw new InvalidRequestException("Request \"" + request.getAction()
                         + "\" is not recognized");
-        }*/
+        }
         return output;
     }
 
@@ -170,6 +184,8 @@ public class AccountManager {
     public Set<String> getAccountNames() throws AccountNotFoundException {
         if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("No accounts are currently loaded");
+        } else {
+            System.out.println("Test");
         }
         return namesToAccounts.keySet();
     }

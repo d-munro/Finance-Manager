@@ -16,7 +16,7 @@ public class Transaction {
     private Item item;
     private int quantity;
     private LocalDate date;
-    private int id;
+    private final long id;
 
     /**
      * Creates a Transaction which contains various information about a purchase
@@ -27,7 +27,7 @@ public class Transaction {
      * @param quantity The quantity of items purchased
      * @param id An identifier used to refer to the transaction
      */
-    public Transaction(Item item, LocalDate date, int quantity, int id) {
+    public Transaction(Item item, LocalDate date, int quantity, long id) {
         this.item = item;
         this.date = date;
         this.quantity = quantity;
@@ -45,7 +45,7 @@ public class Transaction {
      * @param id An identifier used to refer to the transaction
      */
     public Transaction(String itemName, double itemFee, String itemCategory,
-            LocalDate date, int quantity, int id) {
+            LocalDate date, int quantity, long id) {
         this.item = new Item(itemFee, itemName, itemCategory);
         this.date = date;
         this.quantity = quantity;
@@ -56,9 +56,11 @@ public class Transaction {
      * Constructor
      *
      * @param obj JSONObject representation of the transaction to be added
+     * @param id Identifier used to reference the transaction
+     * 
      * @throws CorruptJSONObjectException
      */
-    public Transaction(JSONObject obj) throws CorruptJSONObjectException {
+    public Transaction(JSONObject obj, long id) throws CorruptJSONObjectException {
 
         //process the value of transaction
         if (obj.get("item") == null) {
@@ -72,6 +74,7 @@ public class Transaction {
         } else {
             this.date = LocalDate.parse((String) obj.get("date"));
         }
+        this.id = id;
     }
 
     /**
@@ -99,7 +102,7 @@ public class Transaction {
      * 
      * @return The transaction id
      */
-    public int getId() {
+    public long getId() {
         return id;
     }
     

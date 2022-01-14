@@ -104,6 +104,7 @@ public class IO {
     private AccountRequest getAccountRequest(String action, Scanner input) throws InvalidRequestException {
         AccountRequest request = null;
         String userInput;
+        System.out.println("Action: " + action);
         switch (action) { //Handles cases where multiple parameters are needed
             case "add account":
                 System.out.println("Enter the name of the account:");
@@ -149,7 +150,7 @@ public class IO {
      * @return The newly created TransactionRequest object
      */    
     private TransactionRequest getTransactionRequest(String action, Scanner input) 
-            throws InvalidRequestException, AccountNotFoundException {
+            throws InvalidRequestException, AccountNotFoundException, TransactionNotFoundException {
         TransactionRequest request = null;
         switch (action) {
             case "add transaction":
@@ -171,13 +172,6 @@ public class IO {
                 int transactionId = getInt(input,
                         "Enter the id of the transaction you wish to delete");
                 request = new TransactionRequest(action, transactionId);
-                break;
-            case "sort transaction":
-                String prompt = "Enter 1 to sort the transactions chronologically"
-                        + "\nEnter 2 to sort the transactions by cost"
-                        + "\nEnter 3 to sort the transactions by category";
-                int sortingMethod = getInt(input, prompt);
-                request = new TransactionRequest(action, sortingMethod);
                 break;
             default:
                 throw new InvalidRequestException("The specified action could not be found\n");
@@ -344,8 +338,11 @@ public class IO {
      * Prints all transactions for the account selected in the account manager
      * 
      * @throws InvalidRequestException
+     * @throws AccountNotFoundException
+     * @throws TransactionNotFoundException
      */
-    public void printTransactions() throws InvalidRequestException, AccountNotFoundException {
+    public void printTransactions() throws InvalidRequestException,
+            AccountNotFoundException, TransactionNotFoundException {
         System.out.println("Here are all transactions for the current account:");
         System.out.println(manager.executeRequest(parser.generateRequest("display")));
     }
@@ -365,27 +362,30 @@ public class IO {
             System.out.println(AccountManager.getHelp());
             userChoice = input.nextLine();
             try {
+                System.out.println("In switch");
                 switch (parser.getActionObject(userChoice)) {
                     case Request.ACCOUNT:
+                        System.out.println("In account");
                         currentRequest = getAccountRequest(userChoice, input);
                         break;
                     case Request.TRANSACTION:
+                        System.out.println("In request");
                         currentRequest = getTransactionRequest(userChoice, input);
                         break;
                     case Request.SORTING:
+                        System.out.println("In sorting");
                         currentRequest = getSortingRequest(userChoice, input);
                         break;
                     default:
+                        System.out.println("In standard");
                         currentRequest = parser.generateRequest(userChoice);
                         break;
                 }
                 output = manager.executeRequest(currentRequest);
                 System.out.println(output + "\n");
-            } catch (InvalidRequestException | AccountNotFoundException e) {
+            } catch (InvalidRequestException | AccountNotFoundException | TransactionNotFoundException e) {
                 System.out.println(e.getMessage() + "\n");
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number");
-            }
+            } 
         }
     }
 }

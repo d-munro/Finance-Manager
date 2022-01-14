@@ -18,7 +18,7 @@ public class TransactionRequest extends Request{
     private int quantity;
     
     //Details for deleting a transaction
-    private int id;
+    private long id;
     
     /**
      * Generates a Request capable of building a new Transaction
@@ -50,7 +50,7 @@ public class TransactionRequest extends Request{
      * transaction
      * @param id A unique identifier used to reference the transaction
      */
-    public TransactionRequest(String action, int id) {
+    public TransactionRequest(String action, long id) {
         this.id = id;
     }
 
@@ -78,7 +78,7 @@ public class TransactionRequest extends Request{
      * 
      * @return The unique identifier referencing the Transaction
      */
-    public int getId() {
+    public long getId() {
         return id;
     }
 }

@@ -36,6 +36,7 @@ public class AccountManager {
         Account account = new Account(accountName);
         namesToAccounts.put(account.getName(), account);
         activeAccount = account;
+        numOfAccountsLoaded++;
         return "New account created with the name " + accountName + "."
                 + "\n" + accountName + " is now the active account.";
     }

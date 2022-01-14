@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import java.time.LocalDate;
+import java.util.InputMismatchException;
 
 /**
  * Handles all input and output for the finance package
@@ -28,9 +29,10 @@ public class IO {
 
     private final AccountManager manager = new AccountManager();
     private final Parser parser = new Parser();
-    
+
     /**
      * Obtains a double from a prompt with exception checking
+     *
      * @param input The Scanner reading the user's input
      * @param prompt The question to prompt the user with
      * @return A valid double
@@ -38,20 +40,22 @@ public class IO {
     public double getDouble(Scanner input, String prompt) {
         double response = 0;
         boolean isValidResponse = false;
+        System.out.println(prompt);
         while (!isValidResponse) {
             try {
-                System.out.println(prompt);
                 response = input.nextDouble();
                 isValidResponse = true;
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a number without alphabetical characters");
-            }           
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter a number containing only decimal digits");
+                input.nextLine(); //Clear newline char entered with number
+            }
         }
         return response;
     }
-    
+
     /**
      * Obtains an int from a prompt with exception checking
+     *
      * @param input The Scanner reading the user's input
      * @param prompt The question to prompt the user with
      * @return A valid int
@@ -59,18 +63,19 @@ public class IO {
     public int getInt(Scanner input, String prompt) {
         int response = 0;
         boolean isValidResponse = false;
+        System.out.println(prompt);
         while (!isValidResponse) {
             try {
-                System.out.println(prompt);
                 response = input.nextInt();
                 isValidResponse = true;
-            } catch (NumberFormatException e) {
+            } catch (InputMismatchException e) {
                 System.out.println("Please enter an integer");
-            }           
+                input.nextLine(); //Clear newline char entered with number
+            }
         }
         return response;
     }
-    
+
     /**
      * Obtains the path from the user to the JSON file with account details
      *
@@ -93,20 +98,17 @@ public class IO {
     }
 
     /**
-     * Obtains all necessary user input to create an AccountRequest object 
-     * and creates it
+     * Obtains all necessary user input to create an AccountRequest object and
+     * creates it
      *
      * @param action The action word describing the functionality of the Request
      * @param input The Scanner which user input is being read from
-     * 
+     *
      * @return The newly created AccountRequest object
      */
-    private AccountRequest getAccountRequest(String action, Scanner input) 
+    private AccountRequest getAccountRequest(String action, Scanner input)
             throws InvalidRequestException, AccountNotFoundException {
-        if (action.compareToIgnoreCase("add account") != 0 && manager.getNumOfAccountsLoaded() == 0) {
-            throw new AccountNotFoundException("You must load or create an account first");
-        }
-        AccountRequest request = null;
+        AccountRequest request;
         String userInput;
         System.out.println("Action: " + action);
         switch (action) { //Handles cases where multiple parameters are needed
@@ -114,9 +116,15 @@ public class IO {
                 System.out.println("Enter the name of the account:");
                 break;
             case "change account":
+                if (manager.getNumOfAccountsLoaded() == 0) {
+                    throw new AccountNotFoundException("You must load or create an account first");
+                }
                 System.out.println("Enter the name of the account to change to:");
                 break;
             case "delete account":
+                if (manager.getNumOfAccountsLoaded() == 0) {
+                    throw new AccountNotFoundException("You must load or create an account first");
+                }
                 System.out.println("Enter the name of the account to delete:");
                 break;
             default:
@@ -128,58 +136,61 @@ public class IO {
     }
 
     /**
-     * Obtains all necessary user input to create an SortingRequest object 
-     * and creates it
+     * Obtains all necessary user input to create an SortingRequest object and
+     * creates it
      *
      * @param action The action word describing the functionality of the Request
      * @param input The Scanner which user input is being read from
-     * 
+     *
      * @return The newly created SortingRequest object
      */
-    private SortingRequest getSortingRequest(String action, Scanner input) 
+    private SortingRequest getSortingRequest(String action, Scanner input)
             throws InvalidRequestException, AccountNotFoundException {
         if (!manager.hasActiveAccount()) {
             throw new AccountNotFoundException("Please select an account first");
         }
         String prompt = "Enter 1 to sort the transactions chronologically"
-            + "\nEnter 2 to sort the transactions by cost"
-            + "\nEnter 3 to sort the transactions by category";
+                + "\nEnter 2 to sort the transactions by cost"
+                + "\nEnter 3 to sort the transactions by category";
         int sortingMethod = getInt(input, prompt);
         SortingRequest request = new SortingRequest(action, sortingMethod);
         return request;
     }
-    
+
     /**
-     * Obtains all necessary user input to create an TransactionRequest object 
+     * Obtains all necessary user input to create an TransactionRequest object
      * and creates it
      *
      * @param action The action word describing the functionality of the Request
      * @param input The Scanner which user input is being read from
-     * 
+     *
      * @return The newly created TransactionRequest object
-     */    
-    private TransactionRequest getTransactionRequest(String action, Scanner input) 
+     */
+    private TransactionRequest getTransactionRequest(String action, Scanner input)
             throws InvalidRequestException, AccountNotFoundException, TransactionNotFoundException {
-        if (!manager.hasActiveAccount()) {
-            throw new AccountNotFoundException("No active account selected");
-        }
         TransactionRequest request = null;
         switch (action) {
             case "add transaction":
+                if (!manager.hasActiveAccount()) {
+                    throw new AccountNotFoundException("No active account selected");
+                }
                 System.out.println("Enter the name of the item");
                 String itemName = input.nextLine();
                 System.out.println("Enter the category of the item");
                 String itemCategory = input.nextLine();
-                System.out.println("Enter the cost of the item");
                 double itemFee = getDouble(input, "Enter the fee associated with the item");
                 int quantity = getInt(input, "Enter the quantity of the item purchased");
-                LocalDate purchaseDate = getDate(input, 
+                input.nextLine(); //Must read newline char after parsing a number
+                LocalDate purchaseDate = getDate(input,
                         "Enter the date of the transaction (yyyy-mm-dd)."
-                                + "\nAlternatively, enter \"today\" if the item was purchased today");
+                        + "\nAlternatively, enter \"today\" if the item was purchased today");
                 request = new TransactionRequest(action, itemName, itemFee,
-                    itemCategory, purchaseDate, quantity);
+                        itemCategory, purchaseDate, quantity);
                 break;
             case "delete transaction":
+                if (!manager.hasActiveAccount()) {
+                    throw new AccountNotFoundException("No active account selected");
+                }
                 printTransactions();
                 int transactionId = getInt(input,
                         "Enter the id of the transaction you wish to delete");
@@ -190,40 +201,43 @@ public class IO {
         }
         return request;
     }
-    
+
     /**
      * Generates a date given a prompt and checks if the date is legitimate
+     *
      * @param input The Scanner which input is being read from
      * @param prompt The question being asked to the user
      */
     private LocalDate getDate(Scanner input, String prompt) {
         LocalDate date = LocalDate.now();
         boolean isValid = false;
-        String userInput;
+        String userInput = "";
         while (!isValid) {
             try {
                 System.out.println(prompt);
                 userInput = input.nextLine();
                 date = generateDate(userInput);
                 isValid = true;
-            } catch (InvalidInputException | ParseException e) {
-                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Please enter a valid date in the format (yyyy-mm-dd)");
+                System.out.println("Alternatively, type \"today\" to enter the current date");
             }
         }
         return date;
     }
-    
+
     /**
-     * Generates a date from a String given in the form (yyyy-mm-dd). 
-     * Alternatively, if the String given is "today", the current date is generated. 
-     * 
+     * Generates a date from a String given in the form (yyyy-mm-dd).
+     * Alternatively, if the String given is "today", the current date is
+     * generated.
+     *
      * @param str The date formatted as a string in the format (yyyy-mm-dd)
-     * 
+     *
      * @throws InvalidInputException
-     * 
+     *
      * @return A date object representing the input String
      */
-    private LocalDate generateDate(String str) throws InvalidInputException, ParseException {
+    private LocalDate generateDate(String str) throws ParseException {
         if (str.compareToIgnoreCase("today") == 0) {
             return LocalDate.now();
         }
@@ -264,11 +278,13 @@ public class IO {
         return (str.compareToIgnoreCase("Yes") == 0
                 || str.compareToIgnoreCase("No") == 0);
     }
-    
+
     /**
      * Determines if a string can be converted to an integer
+     *
      * @param str The string being converted
-     * @return true if the string can be converted to an integer, false otherwise
+     * @return true if the string can be converted to an integer, false
+     * otherwise
      */
     private boolean isInteger(String str) {
         for (int i = 0; i < str.length(); i++) {
@@ -345,10 +361,10 @@ public class IO {
         ioHandler.load(input);
         ioHandler.run(input);
     }
-    
+
     /**
      * Prints all transactions for the account selected in the account manager
-     * 
+     *
      * @throws InvalidRequestException
      * @throws AccountNotFoundException
      * @throws TransactionNotFoundException
@@ -394,9 +410,9 @@ public class IO {
                         break;
                 }
                 output = manager.executeRequest(currentRequest);
-                System.out.println(output + "\n");
+                System.out.println(output);
             } catch (InvalidRequestException | AccountNotFoundException | TransactionNotFoundException e) {
-                System.out.println(e.getMessage() + "\n");
+                System.out.println(e.getMessage());
             }
         }
     }

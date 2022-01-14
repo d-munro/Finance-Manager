@@ -1,4 +1,3 @@
-//TODO move the value (cost) of item to the Item class
 package finance;
 
 import java.time.LocalDate;
@@ -72,7 +71,11 @@ public class Transaction {
         if (obj.get("date") == null) {
             this.date = LocalDate.now();
         } else {
-            this.date = LocalDate.parse((String) obj.get("date"));
+            try {
+               this.date = LocalDate.parse((String) obj.get("date"));                
+            } catch (Exception e) {
+                throw new CorruptJSONObjectException("Transaction date format invalid");
+            }
         }
         this.id = id;
     }

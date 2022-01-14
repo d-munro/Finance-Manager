@@ -10,14 +10,11 @@ import java.time.LocalDate;
  */
 public class TransactionRequest extends Request{
     
-    //Details for creating a new transaction
     private String itemName;
     private double itemFee;
     private String itemCategory;
     private LocalDate date;
     private int quantity;
-    
-    //Details for deleting a transaction
     private long id;
     
     /**

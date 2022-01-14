@@ -82,7 +82,7 @@ public class IO {
      * @param input The Scanner which input is being read from
      * @return The path to the JSON file with account details
      */
-    private BufferedReader getAccountFilePath(Scanner input) {
+    /*private BufferedReader getAccountFilePath(Scanner input) {
         BufferedReader fileStream = null;
         boolean isValidFile = false;
         while (!isValidFile) {
@@ -93,6 +93,18 @@ public class IO {
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
+        }
+        return fileStream;
+    }*/
+    
+    private BufferedReader getAccountFilePath(Scanner input) throws IOException {
+        BufferedReader fileStream = null;
+        System.out.println("Enter the path to the file with the account details");
+        String userResponse = input.nextLine();
+        try {
+            fileStream = new BufferedReader(new FileReader(userResponse));
+        } catch (IOException e) {
+            throw new IOException("The file \"" + userResponse + "\" could not be found");
         }
         return fileStream;
     }
@@ -211,7 +223,7 @@ public class IO {
     private LocalDate getDate(Scanner input, String prompt) {
         LocalDate date = LocalDate.now();
         boolean isValid = false;
-        String userInput = "";
+        String userInput;
         while (!isValid) {
             try {
                 System.out.println(prompt);
@@ -333,19 +345,28 @@ public class IO {
             IOException {
         JSONObject accountsJson;
         BufferedReader activeStream = null;
+        boolean loadedValidFile = false;
         String userResponse = getYesOrNoResponse(
                 "Would you like to load a file with account details? (Yes/No)", input);
         if (userResponse.compareToIgnoreCase("Yes") == 0) {
-            try {
-                activeStream = getAccountFilePath(input);
-                accountsJson = loadAccountsJSON(activeStream);
-                manager.generateAccounts(accountsJson);
-            } catch (CorruptJSONObjectException | AccountNotFoundException e) {
-                System.out.println(e.getMessage());
-            } finally {
-                if (activeStream != null) {
-                    activeStream.close();
-                }
+            while (!loadedValidFile) {
+                try {
+                    activeStream = getAccountFilePath(input);
+                    accountsJson = loadAccountsJSON(activeStream);
+                    manager.generateAccounts(accountsJson);
+                    loadedValidFile = true;
+                } catch (CorruptJSONObjectException | AccountNotFoundException e) {
+                    System.out.println(e.getMessage());
+                    userResponse = getYesOrNoResponse(
+                            "Would you like to load a different file? (Yes/No)", input);
+                    if (userResponse.compareToIgnoreCase("no") == 0) {
+                        return;
+                    }
+                } finally {
+                    if (activeStream != null) {
+                        activeStream.close();
+                    }
+                }                
             }
         }
     }
@@ -390,22 +411,17 @@ public class IO {
             System.out.println(AccountManager.getHelp());
             userChoice = input.nextLine();
             try {
-                System.out.println("In switch");
                 switch (parser.getActionObject(userChoice)) {
                     case Request.ACCOUNT:
-                        System.out.println("In account");
                         currentRequest = getAccountRequest(userChoice, input);
                         break;
                     case Request.TRANSACTION:
-                        System.out.println("In request");
                         currentRequest = getTransactionRequest(userChoice, input);
                         break;
                     case Request.SORTING:
-                        System.out.println("In sorting");
                         currentRequest = getSortingRequest(userChoice, input);
                         break;
                     default:
-                        System.out.println("In standard");
                         currentRequest = parser.generateRequest(userChoice);
                         break;
                 }

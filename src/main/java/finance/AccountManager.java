@@ -1,9 +1,3 @@
-/*--------------------------------TODO---------------------
-Correct getSpecification() methods in account/transaction requests
-    -Either implement getSpecification() in appropriate classes, or change getSpecification() to getData()
-Refactor request execution methods to work with Request subclasses
-Be sure to check for instances where activeAccount = null
- */
 package finance;
 
 import java.util.HashMap;
@@ -119,7 +113,6 @@ public class AccountManager {
     public String executeRequest(Request request)
             throws AccountNotFoundException, InvalidRequestException, TransactionNotFoundException {
         String output = "";
-        System.out.println("In execute");
         switch (request.getAction()) {
             case "add account":
                 output = executeAddAccountRequest((AccountRequest)request);
@@ -172,7 +165,12 @@ public class AccountManager {
     public void generateAccounts(JSONObject obj) throws
             CorruptJSONObjectException, AccountNotFoundException {
         Account currentAccount;
-        JSONArray accountsArray = (JSONArray) obj.get("accounts");
+        JSONArray accountsArray;
+        try {
+            accountsArray = (JSONArray) obj.get("accounts");           
+        } catch (Exception e) {
+            throw new CorruptJSONObjectException("The JSON file is corrupted and could not be parsed");
+        }
         for (int i = 0; i < accountsArray.size(); i++) {
             currentAccount = new Account((JSONObject) accountsArray.get(i));
             namesToAccounts.put(currentAccount.getName(), currentAccount);
@@ -185,8 +183,6 @@ public class AccountManager {
     public Set<String> getAccountNames() throws AccountNotFoundException {
         if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("No accounts are currently loaded");
-        } else {
-            System.out.println("Test");
         }
         return namesToAccounts.keySet();
     }

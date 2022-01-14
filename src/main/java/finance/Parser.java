@@ -2,6 +2,7 @@ package finance;
 
 //imports
 import java.time.LocalDate;
+import java.util.HashMap;
 
 /**
  * Creates a parser object to generate requests from user commands
@@ -124,7 +125,8 @@ public class Parser {
      */
     public int getActionObject(String action) throws InvalidRequestException {
         String[] words = action.split(" ");
-        if (words.length == 1) {
+        HashMap<String, String> oneParamActions = Request.getONE_PARAM_ACTION_DESCRIPTIONS();
+        if (words.length == 1 || oneParamActions.containsKey(action)) {
             return Request.NONE;
         } else if (words.length == 2 && words[1].compareToIgnoreCase("account") == 0) {
             return Request.ACCOUNT;

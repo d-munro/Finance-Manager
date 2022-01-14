@@ -202,6 +202,13 @@ public class AccountManager {
         }
         return activeAccount.getName();
     }
+    
+    /**
+     * @return The number of accounts currently loaded in the account manager
+     */
+    public int getNumOfAccountsLoaded() {
+        return numOfAccountsLoaded;
+    }
 
     /**
      *
@@ -219,6 +226,15 @@ public class AccountManager {
             sb.append("Type \"").append(current.getKey()).append("\" to ").append(current.getValue()).append("\n");
         }
         return sb.toString();
+    }
+    
+    /**
+     * 
+     * @return true if there is currently an active account in the account manager, 
+     * false otherwise
+     */
+    public boolean hasActiveAccount() {
+        return activeAccount != null;
     }
 
     private void setActiveAccount(String accountName) throws AccountNotFoundException {

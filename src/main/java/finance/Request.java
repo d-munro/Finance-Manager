@@ -27,7 +27,7 @@ public class Request {
     //Static initialization of ONE_PARAM_ACTION_DESCRIPTIONS
     static {
         ONE_PARAM_ACTION_DESCRIPTIONS = new LinkedHashMap<String, String>();
-        ONE_PARAM_ACTION_DESCRIPTIONS.put("help", "add a transaction to the current active account");
+        ONE_PARAM_ACTION_DESCRIPTIONS.put("help", "display the help menu");
         ONE_PARAM_ACTION_DESCRIPTIONS.put("quit", "terminate the program");
         ONE_PARAM_ACTION_DESCRIPTIONS.put("display account", "display all currently loaded accounts");
         ONE_PARAM_ACTION_DESCRIPTIONS.put("display transaction", "display all transactions for the current active account");
@@ -60,9 +60,10 @@ public class Request {
     public Request(String action) throws InvalidRequestException {
         if (ONE_PARAM_ACTION_DESCRIPTIONS.containsKey(action)) {
             this.action = action.toLowerCase();
+        } else {
+            throw new InvalidRequestException("The action " + action + " does"
+                + " not exist or requires arguments");           
         }
-        throw new InvalidRequestException("The action " + action + " does"
-                + " not exist or requires arguments");
     }
      
     /**

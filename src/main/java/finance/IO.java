@@ -101,7 +101,11 @@ public class IO {
      * 
      * @return The newly created AccountRequest object
      */
-    private AccountRequest getAccountRequest(String action, Scanner input) throws InvalidRequestException {
+    private AccountRequest getAccountRequest(String action, Scanner input) 
+            throws InvalidRequestException, AccountNotFoundException {
+        if (action.compareToIgnoreCase("add account") != 0 && manager.getNumOfAccountsLoaded() == 0) {
+            throw new AccountNotFoundException("You must load or create an account first");
+        }
         AccountRequest request = null;
         String userInput;
         System.out.println("Action: " + action);
@@ -110,11 +114,13 @@ public class IO {
                 System.out.println("Enter the name of the account:");
                 break;
             case "change account":
-                System.out.println("Enter the name of the account to change to");
+                System.out.println("Enter the name of the account to change to:");
                 break;
             case "delete account":
                 System.out.println("Enter the name of the account to delete:");
                 break;
+            default:
+                throw new InvalidRequestException("The specified action could not be found");
         }
         userInput = input.nextLine();
         request = new AccountRequest(action, userInput);
@@ -131,7 +137,10 @@ public class IO {
      * @return The newly created SortingRequest object
      */
     private SortingRequest getSortingRequest(String action, Scanner input) 
-            throws InvalidRequestException {
+            throws InvalidRequestException, AccountNotFoundException {
+        if (!manager.hasActiveAccount()) {
+            throw new AccountNotFoundException("Please select an account first");
+        }
         String prompt = "Enter 1 to sort the transactions chronologically"
             + "\nEnter 2 to sort the transactions by cost"
             + "\nEnter 3 to sort the transactions by category";
@@ -151,6 +160,9 @@ public class IO {
      */    
     private TransactionRequest getTransactionRequest(String action, Scanner input) 
             throws InvalidRequestException, AccountNotFoundException, TransactionNotFoundException {
+        if (!manager.hasActiveAccount()) {
+            throw new AccountNotFoundException("No active account selected");
+        }
         TransactionRequest request = null;
         switch (action) {
             case "add transaction":
@@ -174,7 +186,7 @@ public class IO {
                 request = new TransactionRequest(action, transactionId);
                 break;
             default:
-                throw new InvalidRequestException("The specified action could not be found\n");
+                throw new InvalidRequestException("The specified action could not be found");
         }
         return request;
     }
@@ -385,7 +397,7 @@ public class IO {
                 System.out.println(output + "\n");
             } catch (InvalidRequestException | AccountNotFoundException | TransactionNotFoundException e) {
                 System.out.println(e.getMessage() + "\n");
-            } 
+            }
         }
     }
 }

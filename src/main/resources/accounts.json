@@ -9,7 +9,7 @@
                         "fee": 1500.00,
                         "category": "Health/Fitness"
                     },
-                    "date": "January 1, 2000",
+                    "date": "2000-01-05",
                     "quantity": 1
                 },
                 {
@@ -17,13 +17,16 @@
                         "name": "Gears",
                         "fee": -499.99
                     },
-                    "date": "February 23, 2000"
+                    "date": "2000-02-13",
+                    "quantity": 2
                 },
                 {
                     "item": {
                         "name": "Cake",
                         "fee": 19.99
-                    }
+                    },
+                    "date": "2021-09-09",
+                    "quantity": 3
                 }
             ]
         }

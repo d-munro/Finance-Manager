@@ -113,6 +113,7 @@ public class AccountManager {
     public String executeRequest(Request request)
             throws AccountNotFoundException, InvalidRequestException, TransactionNotFoundException {
         String output = "";
+        System.out.println("action: " + request.getAction());
         switch (request.getAction()) {
             case "add account":
                 output = executeAddAccountRequest((AccountRequest)request);

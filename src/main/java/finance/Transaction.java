@@ -1,9 +1,14 @@
+/*TODO
+-Refactor Transaction(JSONObject) constructor by parsing date and quantity
+    in their own methods
+*/
 package finance;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.InputMismatchException;
 
 import org.json.simple.JSONObject;
-import org.json.simple.JSONArray;
 
 /**
  * Creates a Transaction object which describes changes in an Account's value
@@ -32,10 +37,10 @@ public class Transaction {
         this.quantity = quantity;
         this.id = id;
     }
-    
+
     /**
      * Creates a Transaction which contains various information about a purchase
-     * 
+     *
      * @param itemName The name of the item purchased
      * @param itemFee The fee associated with the item purchased
      * @param itemCategory The broad category describing the item purchased
@@ -56,25 +61,45 @@ public class Transaction {
      *
      * @param obj JSONObject representation of the transaction to be added
      * @param id Identifier used to reference the transaction
-     * 
+     *
      * @throws CorruptJSONObjectException
      */
-    public Transaction(JSONObject obj, long id) throws CorruptJSONObjectException {
+    public Transaction(JSONObject obj, long id) throws CorruptJSONObjectException,
+            DateTimeParseException, InputMismatchException {
+        String dateString = "";
+        String temp;
 
-        //process the value of transaction
+        //process the transaction item
         if (obj.get("item") == null) {
             throw new CorruptJSONObjectException("Transaction does not have an item");
         }
         this.item = new Item((JSONObject) obj.get("item"));
+
+        //process the quantity of items involved in the transaction
+        if (obj.get("quantity") == null) {
+            throw new CorruptJSONObjectException(
+                    "No integer quantity attached to the item:\n" + this.item.toString());
+        }
+        try {
+            temp = obj.get("quantity").toString();
+            this.quantity = Integer.parseInt(temp);
+        } catch (InputMismatchException e) {
+            throw new CorruptJSONObjectException(
+                    "No integer quantity attached to the item:\n" + this.item.toString());
+        }
 
         //process the date of transaction
         if (obj.get("date") == null) {
             this.date = LocalDate.now();
         } else {
             try {
-               this.date = LocalDate.parse((String) obj.get("date"));                
+                dateString = (String) obj.get("date");
+                this.date = LocalDate.parse(dateString);
+            } catch (DateTimeParseException e) {
+                throw new CorruptJSONObjectException(
+                        "The date " + dateString + " must be in the format (yyyy-mm-dd)");
             } catch (Exception e) {
-                throw new CorruptJSONObjectException("Transaction date format invalid");
+                throw new CorruptJSONObjectException("Transaction date can not be parsed");
             }
         }
         this.id = id;
@@ -91,7 +116,7 @@ public class Transaction {
     }
 
     /**
-     * The date describes when the transaction was created. It is in the format 
+     * The date describes when the transaction was created. It is in the format
      * yyyy-MM-dd
      *
      * @return The date of the transaction
@@ -99,25 +124,25 @@ public class Transaction {
     public LocalDate getDate() {
         return date;
     }
-    
+
     /**
      * The id is an identifier used to reference the transaction
-     * 
+     *
      * @return The transaction id
      */
     public long getId() {
         return id;
     }
-    
+
     /**
      * The quantity describes the number of items purchased in the transaction
-     * 
+     *
      * @return The quantity of items purchased in the transaction
      */
     public int getQuantity() {
         return quantity;
     }
-    
+
     /**
      * @return The cost and date of the transaction formatted as a string
      */

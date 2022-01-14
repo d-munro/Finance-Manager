@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 
 /**
@@ -96,7 +97,6 @@ public class IO {
         }
         return fileStream;
     }*/
-    
     private BufferedReader getAccountFilePath(Scanner input) throws IOException {
         BufferedReader fileStream = null;
         System.out.println("Enter the path to the file with the account details");
@@ -122,7 +122,6 @@ public class IO {
             throws InvalidRequestException, AccountNotFoundException {
         AccountRequest request;
         String userInput;
-        System.out.println("Action: " + action);
         switch (action) { //Handles cases where multiple parameters are needed
             case "add account":
                 System.out.println("Enter the name of the account:");
@@ -355,7 +354,8 @@ public class IO {
                     accountsJson = loadAccountsJSON(activeStream);
                     manager.generateAccounts(accountsJson);
                     loadedValidFile = true;
-                } catch (CorruptJSONObjectException | AccountNotFoundException e) {
+                } catch (CorruptJSONObjectException | InputMismatchException
+                        | AccountNotFoundException | DateTimeParseException e) {
                     System.out.println(e.getMessage());
                     userResponse = getYesOrNoResponse(
                             "Would you like to load a different file? (Yes/No)", input);
@@ -366,7 +366,7 @@ public class IO {
                     if (activeStream != null) {
                         activeStream.close();
                     }
-                }                
+                }
             }
         }
     }

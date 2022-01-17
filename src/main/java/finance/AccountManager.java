@@ -13,7 +13,6 @@ import org.json.simple.JSONObject;
 public class AccountManager {
 
     private HashMap<String, Account> namesToAccounts = new HashMap<String, Account>();
-    private HashMap<Long, Transaction> idsToTransactions = new HashMap<Long, Transaction>();
     private Account activeAccount;
     private int numOfAccountsLoaded;
 
@@ -41,7 +40,7 @@ public class AccountManager {
             throw new AccountNotFoundException("Please select an active account before making a transaciton");
         }
         activeAccount.addTransaction(new Transaction(request.getItemName(), request.getItemFee(),
-            request.getItemCategory(), request.getDate(), request.getQuantity(), request.getId()));
+            request.getItemCategory(), request.getDate(), request.getQuantity(), activeAccount.getNumOfTransactions() + 1));
         return "The transaction has been added to the account \"" + activeAccount.getName() + "\"";
     }
 
@@ -91,13 +90,13 @@ public class AccountManager {
     
     private String executeDeleteTransactionRequest(TransactionRequest request) throws 
             AccountNotFoundException, TransactionNotFoundException {
-        long transactionId = request.getId();
+        int transactionId = request.getId();
         if (activeAccount == null) {
             throw new AccountNotFoundException("No active account selected");
         } 
         activeAccount.deleteTransaction(transactionId);
-        return "The transaction associated with the id " + transactionId
-                + " has been deleted";
+        return "The transaction associated with the id \"" + transactionId
+                + "\" has been deleted";
     }
 
     private String executeChangeRequest(AccountRequest request) throws AccountNotFoundException {
@@ -113,7 +112,6 @@ public class AccountManager {
     public String executeRequest(Request request)
             throws AccountNotFoundException, InvalidRequestException, TransactionNotFoundException {
         String output = "";
-        System.out.println("action: " + request.getAction());
         switch (request.getAction()) {
             case "add account":
                 output = executeAddAccountRequest((AccountRequest)request);

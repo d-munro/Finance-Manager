@@ -10,7 +10,7 @@ public class TransactionNotFoundException extends Exception {
         this("The transaction could not be found");
     }
     
-    public TransactionNotFoundException(long transactionId) {
+    public TransactionNotFoundException(int transactionId) {
         this("The transaction associated with the id " + transactionId
             + " could not be found");
     }

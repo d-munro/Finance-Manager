@@ -15,7 +15,8 @@ public class TransactionRequest extends Request{
     private String itemCategory;
     private LocalDate date;
     private int quantity;
-    private long id;
+    
+    private int id;
     
     /**
      * Generates a Request capable of building a new Transaction
@@ -46,8 +47,11 @@ public class TransactionRequest extends Request{
      * @param action The keyword describing how the user wishes to change the
      * transaction
      * @param id A unique identifier used to reference the transaction
+     * 
+     * @throws InvalidRequestException
      */
-    public TransactionRequest(String action, long id) {
+    public TransactionRequest(String action, int id) throws InvalidRequestException {
+        super(action, true);
         this.id = id;
     }
 
@@ -75,7 +79,7 @@ public class TransactionRequest extends Request{
      * 
      * @return The unique identifier referencing the Transaction
      */
-    public long getId() {
+    public int getId() {
         return id;
     }
 }

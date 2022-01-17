@@ -10,7 +10,8 @@
                         "category": "Health/Fitness"
                     },
                     "date": "2000-01-05",
-                    "quantity": 1
+                    "quantity": 1,
+                    "transactionNumber": 1
                 },
                 {
                     "item": {
@@ -18,7 +19,8 @@
                         "fee": -499.99
                     },
                     "date": "2000-02-13",
-                    "quantity": 2
+                    "quantity": 1,
+                    "transactionNumber": 2
                 },
                 {
                     "item": {
@@ -26,7 +28,8 @@
                         "fee": 19.99
                     },
                     "date": "2021-09-09",
-                    "quantity": 3
+                    "quantity": 4,
+                    "transactionNumber": 3
                 }
             ]
         }

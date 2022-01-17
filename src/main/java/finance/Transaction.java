@@ -1,6 +1,8 @@
 /*TODO
 -Refactor Transaction(JSONObject) constructor by parsing date and quantity
     in their own methods
+-Implement total transaction cost (itemPrice * quantity)
+-Parse transactionNumber from JSON file
 */
 package finance;
 
@@ -20,7 +22,7 @@ public class Transaction {
     private Item item;
     private int quantity;
     private LocalDate date;
-    private final long id;
+    private int transactionNumber;
 
     /**
      * Creates a Transaction which contains various information about a purchase
@@ -29,13 +31,14 @@ public class Transaction {
      * place
      * @param date Describes when the transaction occurred
      * @param quantity The quantity of items purchased
-     * @param id An identifier used to refer to the transaction
+     * @param transactionNumber The sequential number describing transactions chronologically. 
+     * Note that the transactionNumber should start at 1, not 0, to make reading receipts more intuitive
      */
-    public Transaction(Item item, LocalDate date, int quantity, long id) {
+    public Transaction(Item item, LocalDate date, int quantity, int transactionNumber) {
         this.item = item;
         this.date = date;
         this.quantity = quantity;
-        this.id = id;
+        this.transactionNumber = transactionNumber;
     }
 
     /**
@@ -46,25 +49,27 @@ public class Transaction {
      * @param itemCategory The broad category describing the item purchased
      * @param date The date of the purchase
      * @param quantity The number of items purchased
-     * @param id An identifier used to refer to the transaction
+     * @param transactionNumber The sequential number describing transactions chronologically. 
+     * Note that the transactionNumber should start at 1, not 0, to make reading receipts more intuitive
      */
     public Transaction(String itemName, double itemFee, String itemCategory,
-            LocalDate date, int quantity, long id) {
+            LocalDate date, int quantity, int transactionNumber) {
         this.item = new Item(itemFee, itemName, itemCategory);
         this.date = date;
         this.quantity = quantity;
-        this.id = id;
+        this.transactionNumber = transactionNumber;
     }
 
     /**
      * Constructor
      *
      * @param obj JSONObject representation of the transaction to be added
-     * @param id Identifier used to reference the transaction
+     * @param transactionNumber The sequential number describing transactions chronologically. 
+     * Note that the transactionNumber should start at 1, not 0, to make reading receipts more intuitive
      *
      * @throws CorruptJSONObjectException
      */
-    public Transaction(JSONObject obj, long id) throws CorruptJSONObjectException,
+    public Transaction(JSONObject obj, int transactionNumber) throws CorruptJSONObjectException,
             DateTimeParseException, InputMismatchException {
         String dateString = "";
         String temp;
@@ -88,6 +93,19 @@ public class Transaction {
                     "No integer quantity attached to the item:\n" + this.item.toString());
         }
 
+        //process the transaction number
+        if (obj.get("transactionNumber") == null) {
+            throw new CorruptJSONObjectException(
+                    "No integer transactionNumber attached to the item:\n" + this.item.toString());
+        }
+        /*try {
+            temp = obj.get("transactionNumber").toString();
+            this.quantity = Integer.parseInt(temp);
+        } catch (InputMismatchException e) {
+            throw new CorruptJSONObjectException(
+                    "No integer transactionNumber attached to the item:\n" + this.item.toString());
+        }*/     
+        
         //process the date of transaction
         if (obj.get("date") == null) {
             this.date = LocalDate.now();
@@ -102,7 +120,6 @@ public class Transaction {
                 throw new CorruptJSONObjectException("Transaction date can not be parsed");
             }
         }
-        this.id = id;
     }
 
     /**
@@ -126,21 +143,16 @@ public class Transaction {
     }
 
     /**
-     * The id is an identifier used to reference the transaction
-     *
-     * @return The transaction id
-     */
-    public long getId() {
-        return id;
-    }
-
-    /**
      * The quantity describes the number of items purchased in the transaction
      *
      * @return The quantity of items purchased in the transaction
      */
     public int getQuantity() {
         return quantity;
+    }
+    
+    public int getTransactionNumber() {
+        return transactionNumber;
     }
 
     /**
@@ -150,8 +162,9 @@ public class Transaction {
     public String toString() {
         return "-----------Transaction----------"
                 + "\n" + item
-                + "\nDate: " + date
-                + "\nId: " + id;
+                + "\nQuantity purchased: " + quantity
+                + "\nDate: " + date;
+                //+ "\nTransaction Number: " + transactionNumber;
     }
 
 }

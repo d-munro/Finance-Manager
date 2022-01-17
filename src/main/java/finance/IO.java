@@ -1,7 +1,5 @@
 /*------------------------TODO---------------------------
-Display a meaningful message if user enters an invalid filepath
-    (No valid json file is present at location)
-Don't put account prompting in load
+Implement delete and sort transaction functionality
  */
 package finance;
 
@@ -27,6 +25,9 @@ import java.util.InputMismatchException;
  * @author Dylan Munro
  */
 public class IO {
+    
+    //When testMode is on, automatically loads accounts.json into program
+    boolean testMode = false;
 
     private final AccountManager manager = new AccountManager();
     private final Parser parser = new Parser();
@@ -46,6 +47,7 @@ public class IO {
             try {
                 response = input.nextDouble();
                 isValidResponse = true;
+                input.nextLine();
             } catch (InputMismatchException e) {
                 System.out.println("Please enter a number containing only decimal digits");
                 input.nextLine(); //Clear newline char entered with number
@@ -69,6 +71,7 @@ public class IO {
             try {
                 response = input.nextInt();
                 isValidResponse = true;
+                input.nextLine();
             } catch (InputMismatchException e) {
                 System.out.println("Please enter an integer");
                 input.nextLine(); //Clear newline char entered with number
@@ -97,14 +100,21 @@ public class IO {
         }
         return fileStream;
     }*/
+    
     private BufferedReader getAccountFilePath(Scanner input) throws IOException {
         BufferedReader fileStream = null;
-        System.out.println("Enter the path to the file with the account details");
-        String userResponse = input.nextLine();
-        try {
-            fileStream = new BufferedReader(new FileReader(userResponse));
-        } catch (IOException e) {
-            throw new IOException("The file \"" + userResponse + "\" could not be found");
+        if (!testMode) {
+            System.out.println("Enter the path to the file with the account details");
+            String userResponse = input.nextLine();
+            try {
+                fileStream = new BufferedReader(new FileReader(userResponse));
+            } catch (IOException e) {
+                throw new IOException("The file \"" + userResponse + "\" could not be found");
+            }           
+        } 
+        if (testMode) {
+            //DELETE AFTER TESTING
+            return new BufferedReader(new FileReader("src/main/resources/accounts.json"));
         }
         return fileStream;
     }
@@ -191,7 +201,6 @@ public class IO {
                 String itemCategory = input.nextLine();
                 double itemFee = getDouble(input, "Enter the fee associated with the item");
                 int quantity = getInt(input, "Enter the quantity of the item purchased");
-                input.nextLine(); //Must read newline char after parsing a number
                 LocalDate purchaseDate = getDate(input,
                         "Enter the date of the transaction (yyyy-mm-dd)."
                         + "\nAlternatively, enter \"today\" if the item was purchased today");
@@ -342,6 +351,17 @@ public class IO {
      */
     private void loadFiles(Scanner input) throws CorruptJSONObjectException,
             IOException {
+        
+        //DELETE AFTER TESTING
+        if (testMode) {
+            try {
+                manager.generateAccounts(loadAccountsJSON(getAccountFilePath(input)));                
+            } catch (Exception e ) {
+                System.out.println(e.getMessage());
+            }
+            return;
+        }
+        
         JSONObject accountsJson;
         BufferedReader activeStream = null;
         boolean loadedValidFile = false;
@@ -393,7 +413,7 @@ public class IO {
     public void printTransactions() throws InvalidRequestException,
             AccountNotFoundException, TransactionNotFoundException {
         System.out.println("Here are all transactions for the current account:");
-        System.out.println(manager.executeRequest(parser.generateRequest("display")));
+        System.out.println(manager.executeRequest(parser.generateRequest("display transaction")));
     }
 
     /**

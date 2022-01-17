@@ -3,7 +3,6 @@ package finance;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
-import java.util.HashMap;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
@@ -21,12 +20,6 @@ public class Account {
 
     private int sortingMethod;
     private LinkedList<Transaction> transactions = new LinkedList<>();
-    private HashMap<Long, Transaction> idToTransaction = new HashMap<Long, Transaction>();
-    
-    /*Keeps track of the total number of transactions added, without decreasing 
-    if a transaction is deleted. This gaurantees that every transaction will 
-    have a unique identifier to reference it*/
-    private long nextTransactionId;
 
     /**
      * Constructor for the Account class
@@ -35,7 +28,6 @@ public class Account {
      */
     public Account(String name) {
         this.name = name;
-        this.nextTransactionId = 0;
     }
 
     /**
@@ -46,7 +38,6 @@ public class Account {
      */
     public Account(JSONObject obj) throws CorruptJSONObjectException {
         this.name = obj.get("name").toString();
-        this.nextTransactionId = 0;
         initializeTransactions((JSONArray) obj.get("transactions"));
     }
 
@@ -57,7 +48,6 @@ public class Account {
      */
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction);
-        idToTransaction.put(transaction.getId(), transaction);
     }
     
     /**
@@ -67,9 +57,9 @@ public class Account {
      * @return true if the account contains a transaction with the id, 
      * false otherwise
      */
-    public boolean containsTransaction(long transactionId) {
+    /*public boolean containsTransaction(long transactionId) {
         return idToTransaction.containsKey(transactionId);
-    }
+    }*/
     
     /**
      * Determines if the account contains any transactions
@@ -80,14 +70,22 @@ public class Account {
         return !transactions.isEmpty();
     }
     
-    public void deleteTransaction(long transactionId) throws TransactionNotFoundException {
+    public String deleteTransaction(int index) throws TransactionNotFoundException {
         if (transactions.isEmpty()) {
             throw new TransactionNotFoundException(
                     "No transactions have been made on the account \"" + name + "\"");
-        } else if (!containsTransaction(transactionId)) {
-            throw new TransactionNotFoundException(transactionId);
+        } else if (index >= transactions.size()) {
+            throw new TransactionNotFoundException(index);
         }
-        idToTransaction.remove(transactionId);
+        ListIterator<Transaction> iterator = transactions.listIterator();
+        for (int i = 0; iterator.hasNext() && i <= index; i++) {
+            iterator.next();
+            if (i == index) {
+                iterator.remove();
+                return "The transaction associated with the id " + index + " has been removed";
+            }
+        }
+        throw new TransactionNotFoundException(index);
     }
     
     /**
@@ -110,12 +108,19 @@ public class Account {
     }
 
     /**
-     * Returns the name of account
-     *
+     * 
      * @return The name of the account
      */
     public String getName() {
         return name;
+    }
+    
+    /**
+     * 
+     * @return The number of transactions currently stored on the account
+     */
+    public int getNumOfTransactions() {
+        return transactions.size();
     }
 
     /**
@@ -128,19 +133,9 @@ public class Account {
      */
     private void initializeTransactions(JSONArray transactionsJSON) throws CorruptJSONObjectException {
         JSONObject currentTransactionJson;
-        Transaction currentTransaction;
         for (int i = 0; i < transactionsJSON.size(); i++) {
             currentTransactionJson = (JSONObject) transactionsJSON.get(i);
-            
-            /*Send nextTransactionId + 1 to new transaction rather than incrementing
-            This means that the id can still be used for next transaction 
-            if CorruptJSONObjectException is thrown*/
-            currentTransaction = new Transaction(currentTransactionJson, nextTransactionId + 1);
-            transactions.add(currentTransaction);
-            idToTransaction.put(nextTransactionId, currentTransaction);
-            
-            //Must increase nextTransactionId after adding the transaction in case of CorruptJSONObjectException
-            nextTransactionId++; 
+            transactions.add(new Transaction(currentTransactionJson, i + 1));
         }
     }
 
@@ -154,8 +149,10 @@ public class Account {
         ListIterator<Transaction> iterator = transactions.listIterator();
         StringBuilder returnedString = new StringBuilder();
         returnedString.append(name).append("\n");
+        int i = 0;
         while (iterator.hasNext()) {
-            returnedString.append(iterator.next()).append("\n");
+            returnedString.append(iterator.next())
+                    .append("\nTransaction Number: ").append(i).append("\n");
         }
         return returnedString.toString();
     }

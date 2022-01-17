@@ -34,6 +34,13 @@ public class AccountManager {
                 + "\n" + accountName + " is now the active account.";
     }
     
+    /**
+     * Handles execution of requests to generate new accounts
+     * @param request The request containing the necessary specifications for 
+     * account creation
+     * @return A message informing the user that the request was successful
+     * @throws AccountNotFoundException 
+     */
     private String executeAddTransactionRequest(TransactionRequest request) 
         throws AccountNotFoundException {
         if (activeAccount == null) {
@@ -44,6 +51,11 @@ public class AccountManager {
         return "The transaction has been added to the account \"" + activeAccount.getName() + "\"";
     }
 
+     /**
+     * Handles execution of requests with the action "delete account"
+     * @return Output text of the delete account request
+     * @throws AccountNotFoundException 
+     */
     private String executeDeleteAccountRequest(AccountRequest request) throws AccountNotFoundException {
         StringBuilder returnedString = new StringBuilder();
         if (namesToAccounts.isEmpty()) {
@@ -65,6 +77,11 @@ public class AccountManager {
         return returnedString.toString();
     }
 
+    /**
+     * Handles execution of requests with the action "display account"
+     * @return Output text of the display account request
+     * @throws AccountNotFoundException 
+     */
     private String executeDisplayAccountRequest() throws AccountNotFoundException {
         StringBuilder sb = new StringBuilder();
         for (String current : getAccountNames()) {
@@ -73,6 +90,12 @@ public class AccountManager {
         return sb.toString();
     }
 
+     /**
+     * Handles execution of requests with the action "display transaction"
+     * @return Output text of the display transaction request
+     * @throws AccountNotFoundException
+     * @throws TransactionNotFoundException
+     */  
     private String executeDisplayTransactionRequest() throws
             AccountNotFoundException, TransactionNotFoundException {
         if (activeAccount == null) {
@@ -87,7 +110,13 @@ public class AccountManager {
         }
         return sb.toString();
     }
-    
+
+    /**
+     * Handles execution of requests with the action "delete transaction"
+     * @return Output text of the delete transaction request
+     * @throws AccountNotFoundException
+     * @throws TransactionNotFoundException
+     */    
     private String executeDeleteTransactionRequest(TransactionRequest request) throws 
             AccountNotFoundException, TransactionNotFoundException {
         int transactionId = request.getId();
@@ -98,17 +127,33 @@ public class AccountManager {
         return "The transaction associated with the id \"" + transactionId
                 + "\" has been deleted";
     }
-
+    
+    /**
+     * Handles execution of requests with the action "change account"
+     * @return Output text of the change account request
+     */
     private String executeChangeRequest(AccountRequest request) throws AccountNotFoundException {
         String activeAccountName = request.getAccountName();
         setActiveAccount(activeAccountName);
         return activeAccountName + " is now the active account.";
     }
 
+    /**
+     * Handles execution of requests with the action "quit"
+     * @return Output text of the quit request
+     */
     private String executeQuitRequest() {
         return "Thank you for using Finance Manager!";
     }
 
+    /**
+     * Manages execution of a request object to modify an account
+     * @param request The request to be executed
+     * @return Output text of the request
+     * @throws AccountNotFoundException
+     * @throws InvalidRequestException
+     * @throws TransactionNotFoundException 
+     */
     public String executeRequest(Request request)
             throws AccountNotFoundException, InvalidRequestException, TransactionNotFoundException {
         String output = "";
@@ -150,6 +195,12 @@ public class AccountManager {
         return output;
     }
 
+    /**
+     * Handles execution of requests specifying to sort accounts
+     * @param request The object containing details about the method of sorting
+     * @return Output text of the sort request
+     * @throws InvalidRequestException 
+     */
     private String executeSortRequest(SortingRequest request) throws InvalidRequestException {
         return activeAccount.setSortingMethod(request.getSortingMethod());
     }
@@ -179,6 +230,11 @@ public class AccountManager {
         }
     }
 
+    /**
+     * 
+     * @return Set containing all account names loaded in the account manager
+     * @throws AccountNotFoundException 
+     */
     public Set<String> getAccountNames() throws AccountNotFoundException {
         if (namesToAccounts.isEmpty()) {
             throw new AccountNotFoundException("No accounts are currently loaded");
@@ -233,6 +289,11 @@ public class AccountManager {
         return activeAccount != null;
     }
 
+    /**
+     * Changes the active account in the account manager
+     * @param accountName The name of the account becoming the active account
+     * @throws AccountNotFoundException 
+     */
     private void setActiveAccount(String accountName) throws AccountNotFoundException {
         if (!namesToAccounts.containsKey(accountName)) {
             throw new AccountNotFoundException("The account " + accountName

@@ -27,7 +27,7 @@ import java.util.InputMismatchException;
 public class IO {
     
     //When testMode is on, automatically loads accounts.json into program
-    boolean testMode = false;
+    private boolean testMode = false;
 
     private final AccountManager manager = new AccountManager();
     private final Parser parser = new Parser();
@@ -212,9 +212,9 @@ public class IO {
                     throw new AccountNotFoundException("No active account selected");
                 }
                 printTransactions();
-                int transactionId = getInt(input,
-                        "Enter the id of the transaction you wish to delete");
-                request = new TransactionRequest(action, transactionId);
+                int transactionNumber = getInt(input,
+                        "Enter the transaction number you wish to delete");
+                request = new TransactionRequest(action, transactionNumber);
                 break;
             default:
                 throw new InvalidRequestException("The specified action could not be found");

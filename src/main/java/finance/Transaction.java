@@ -22,7 +22,6 @@ public class Transaction {
     private Item item;
     private int quantity;
     private LocalDate date;
-    private int transactionNumber;
 
     /**
      * Creates a Transaction which contains various information about a purchase
@@ -38,7 +37,6 @@ public class Transaction {
         this.item = item;
         this.date = date;
         this.quantity = quantity;
-        this.transactionNumber = transactionNumber;
     }
 
     /**
@@ -53,23 +51,20 @@ public class Transaction {
      * Note that the transactionNumber should start at 1, not 0, to make reading receipts more intuitive
      */
     public Transaction(String itemName, double itemFee, String itemCategory,
-            LocalDate date, int quantity, int transactionNumber) {
+            LocalDate date, int quantity) {
         this.item = new Item(itemFee, itemName, itemCategory);
         this.date = date;
         this.quantity = quantity;
-        this.transactionNumber = transactionNumber;
     }
 
     /**
      * Constructor
      *
      * @param obj JSONObject representation of the transaction to be added
-     * @param transactionNumber The sequential number describing transactions chronologically. 
-     * Note that the transactionNumber should start at 1, not 0, to make reading receipts more intuitive
      *
      * @throws CorruptJSONObjectException
      */
-    public Transaction(JSONObject obj, int transactionNumber) throws CorruptJSONObjectException,
+    public Transaction(JSONObject obj) throws CorruptJSONObjectException,
             DateTimeParseException, InputMismatchException {
         String dateString = "";
         String temp;
@@ -94,17 +89,17 @@ public class Transaction {
         }
 
         //process the transaction number
-        if (obj.get("transactionNumber") == null) {
+        /*if (obj.get("transactionNumber") == null) {
             throw new CorruptJSONObjectException(
                     "No integer transactionNumber attached to the item:\n" + this.item.toString());
         }
-        /*try {
+        try {
             temp = obj.get("transactionNumber").toString();
-            this.quantity = Integer.parseInt(temp);
+            this.transactionNumber = Integer.parseInt(temp);
         } catch (InputMismatchException e) {
             throw new CorruptJSONObjectException(
                     "No integer transactionNumber attached to the item:\n" + this.item.toString());
-        }*/     
+        }   */
         
         //process the date of transaction
         if (obj.get("date") == null) {
@@ -150,10 +145,6 @@ public class Transaction {
     public int getQuantity() {
         return quantity;
     }
-    
-    public int getTransactionNumber() {
-        return transactionNumber;
-    }
 
     /**
      * @return The cost and date of the transaction formatted as a string
@@ -164,7 +155,6 @@ public class Transaction {
                 + "\n" + item
                 + "\nQuantity purchased: " + quantity
                 + "\nDate: " + date;
-                //+ "\nTransaction Number: " + transactionNumber;
     }
 
 }

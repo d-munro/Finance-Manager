@@ -47,7 +47,7 @@ public class AccountManager {
             throw new AccountNotFoundException("Please select an active account before making a transaciton");
         }
         activeAccount.addTransaction(new Transaction(request.getItemName(), request.getItemFee(),
-            request.getItemCategory(), request.getDate(), request.getQuantity(), activeAccount.getNumOfTransactions() + 1));
+            request.getItemCategory(), request.getDate(), request.getQuantity()));
         return "The transaction has been added to the account \"" + activeAccount.getName() + "\"";
     }
 
@@ -105,8 +105,13 @@ public class AccountManager {
                     "No transactions have been made on the account.");
         }
         StringBuilder sb = new StringBuilder();
+        int currentNum = 1; 
+        //Start at 1 because transactions start at 1, not 0 
+        //(Ex: The 0th transaction doesn't exist)
         for (Transaction current : activeAccount.getTransactions()) {
             sb.append(current.toString()).append("\n");
+            sb.append("Transaction Number: ").append(currentNum).append("\n");
+            currentNum++;
         }
         return sb.toString();
     }
@@ -119,12 +124,12 @@ public class AccountManager {
      */    
     private String executeDeleteTransactionRequest(TransactionRequest request) throws 
             AccountNotFoundException, TransactionNotFoundException {
-        int transactionId = request.getId();
+        int transactionNumber = request.getTransactionNumber();
         if (activeAccount == null) {
             throw new AccountNotFoundException("No active account selected");
         } 
-        activeAccount.deleteTransaction(transactionId);
-        return "The transaction associated with the id \"" + transactionId
+        activeAccount.deleteTransaction(transactionNumber);
+        return "The transaction associated with the id \"" + transactionNumber
                 + "\" has been deleted";
     }
     

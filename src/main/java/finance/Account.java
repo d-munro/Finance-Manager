@@ -74,29 +74,21 @@ public class Account {
         if (transactions.isEmpty()) {
             throw new TransactionNotFoundException(
                     "No transactions have been made on the account \"" + name + "\"");
-        } else if (index >= transactions.size()) {
+        } else if (index > transactions.size()) {
             throw new TransactionNotFoundException(index);
         }
         ListIterator<Transaction> iterator = transactions.listIterator();
-        for (int i = 0; iterator.hasNext() && i <= index; i++) {
+        
+        //transaction numbers start at 1, so i must start at 1
+        for (int i = 1; iterator.hasNext() && i <= index; i++) {
             iterator.next();
             if (i == index) {
                 iterator.remove();
-                return "The transaction associated with the id " + index + " has been removed";
+                return "Transaction " + index + " has been removed";
             }
         }
         throw new TransactionNotFoundException(index);
     }
-    
-    /**
-     * Obtains a transaction associated with a specific transactionId
-     * 
-     * @param transactionId The transactionId of the transaction
-     * 
-     * @return The transaction associated with the given id
-     * 
-     * @throws TransactionNotFoundException
-     */
 
     /**
      * Returns a list of all transactions which have happened in the account
@@ -135,7 +127,7 @@ public class Account {
         JSONObject currentTransactionJson;
         for (int i = 0; i < transactionsJSON.size(); i++) {
             currentTransactionJson = (JSONObject) transactionsJSON.get(i);
-            transactions.add(new Transaction(currentTransactionJson, i + 1));
+            transactions.add(new Transaction(currentTransactionJson));
         }
     }
 

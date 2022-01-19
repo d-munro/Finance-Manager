@@ -37,7 +37,7 @@ public class Request {
         TWO_PARAM_ACTION_DESCRIPTIONS.put("change account", "change the active account");
         TWO_PARAM_ACTION_DESCRIPTIONS.put("delete account", "delete an account");
         TWO_PARAM_ACTION_DESCRIPTIONS.put("delete transaction", "delete a transaction from the current active account");
-        TWO_PARAM_ACTION_DESCRIPTIONS.put("sort transaction", "sort the transactions for the current active account");
+        //TWO_PARAM_ACTION_DESCRIPTIONS.put("sort transaction", "sort the transactions for the current active account");
     }
 
     /**

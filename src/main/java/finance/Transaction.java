@@ -2,7 +2,6 @@
 -Refactor Transaction(JSONObject) constructor by parsing date and quantity
     in their own methods
 -Implement total transaction cost (itemPrice * quantity)
--Parse transactionNumber from JSON file
 */
 package finance;
 
@@ -19,9 +18,9 @@ import org.json.simple.JSONObject;
  */
 public class Transaction {
 
-    private Item item;
-    private int quantity;
-    private LocalDate date;
+    private final Item item;
+    private final int quantity;
+    private final LocalDate date;
 
     /**
      * Creates a Transaction which contains various information about a purchase
@@ -47,8 +46,6 @@ public class Transaction {
      * @param itemCategory The broad category describing the item purchased
      * @param date The date of the purchase
      * @param quantity The number of items purchased
-     * @param transactionNumber The sequential number describing transactions chronologically. 
-     * Note that the transactionNumber should start at 1, not 0, to make reading receipts more intuitive
      */
     public Transaction(String itemName, double itemFee, String itemCategory,
             LocalDate date, int quantity) {
@@ -87,19 +84,6 @@ public class Transaction {
             throw new CorruptJSONObjectException(
                     "No integer quantity attached to the item:\n" + this.item.toString());
         }
-
-        //process the transaction number
-        /*if (obj.get("transactionNumber") == null) {
-            throw new CorruptJSONObjectException(
-                    "No integer transactionNumber attached to the item:\n" + this.item.toString());
-        }
-        try {
-            temp = obj.get("transactionNumber").toString();
-            this.transactionNumber = Integer.parseInt(temp);
-        } catch (InputMismatchException e) {
-            throw new CorruptJSONObjectException(
-                    "No integer transactionNumber attached to the item:\n" + this.item.toString());
-        }   */
         
         //process the date of transaction
         if (obj.get("date") == null) {
@@ -147,7 +131,7 @@ public class Transaction {
     }
 
     /**
-     * @return The cost and date of the transaction formatted as a string
+     * @return The item, cost, and date of the transaction formatted as a string
      */
     @Override
     public String toString() {

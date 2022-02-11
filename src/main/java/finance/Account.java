@@ -1,4 +1,3 @@
-//TODO implement ability to sort transactions chronologically, by category, by cost
 package finance;
 
 import java.util.LinkedList;
@@ -15,14 +14,11 @@ import org.json.simple.JSONArray;
  */
 public class Account {
 
-    //constants
+    private final LinkedList<Transaction> transactions = new LinkedList<>();   
     private final String name;
 
-    private int sortingMethod;
-    private LinkedList<Transaction> transactions = new LinkedList<>();
-
     /**
-     * Constructor for the Account class
+     * Creates an Account object given the name of the Account
      *
      * @param name The name of the account
      */
@@ -31,9 +27,10 @@ public class Account {
     }
 
     /**
-     * Constructor for the Account class
+     * Creates an Account object from its JSON representation
      *
      * @param obj The JSONObject containing all details about the account
+     * 
      * @throws CorruptJSONObjectException
      */
     public Account(JSONObject obj) throws CorruptJSONObjectException {
@@ -42,24 +39,13 @@ public class Account {
     }
 
     /**
-     * Adds a transaction to the account in chronological order
+     * Adds a transaction to the account
      *
      * @param transaction The transaction to be added
      */
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction);
     }
-    
-    /**
-     * Determines if the account contains a transaction belonging to an id
-     * 
-     * @param transactionId The id belonging to the transaction
-     * @return true if the account contains a transaction with the id, 
-     * false otherwise
-     */
-    /*public boolean containsTransaction(long transactionId) {
-        return idToTransaction.containsKey(transactionId);
-    }*/
     
     /**
      * Determines if the account contains any transactions
@@ -70,24 +56,33 @@ public class Account {
         return !transactions.isEmpty();
     }
     
-    public String deleteTransaction(int index) throws TransactionNotFoundException {
+    /**
+     * Deletes a transaction from the account
+     * 
+     * @param transactionNumber The number of the transaction to be removed
+     * 
+     * @return A message informing the user that the transaction deletion was successful
+     * 
+     * @throws TransactionNotFoundException 
+     */
+    public String deleteTransaction(int transactionNumber) throws TransactionNotFoundException {
         if (transactions.isEmpty()) {
             throw new TransactionNotFoundException(
                     "No transactions have been made on the account \"" + name + "\"");
-        } else if (index > transactions.size()) {
-            throw new TransactionNotFoundException(index);
+        } else if (transactionNumber > transactions.size()) {
+            throw new TransactionNotFoundException(transactionNumber);
         }
         ListIterator<Transaction> iterator = transactions.listIterator();
         
         //transaction numbers start at 1, so i must start at 1
-        for (int i = 1; iterator.hasNext() && i <= index; i++) {
+        for (int i = 1; iterator.hasNext() && i <= transactionNumber; i++) {
             iterator.next();
-            if (i == index) {
+            if (i == transactionNumber) {
                 iterator.remove();
-                return "Transaction " + index + " has been removed";
+                return "Transaction " + transactionNumber + " has been removed";
             }
         }
-        throw new TransactionNotFoundException(index);
+        throw new TransactionNotFoundException(transactionNumber);
     }
 
     /**
@@ -100,7 +95,6 @@ public class Account {
     }
 
     /**
-     * 
      * @return The name of the account
      */
     public String getName() {
@@ -108,7 +102,6 @@ public class Account {
     }
     
     /**
-     * 
      * @return The number of transactions currently stored on the account
      */
     public int getNumOfTransactions() {
@@ -121,6 +114,7 @@ public class Account {
      *
      * @param transactionsJSON JSONArray containing all transactions of the
      * account
+     * 
      * @throws CorruptJSONObjectException
      */
     private void initializeTransactions(JSONArray transactionsJSON) throws CorruptJSONObjectException {
@@ -132,9 +126,7 @@ public class Account {
     }
 
     /**
-     * Returns the name of the account and a list of all transactions
-     *
-     * @return The name of the account and a list of all transactions
+     * @return The name of the account and a list of its transactions formatted as a string
      */
     @Override
     public String toString() {
@@ -148,37 +140,4 @@ public class Account {
         }
         return returnedString.toString();
     }
-
-    /**
-     * Sorts all transactions in the account in chronological order
-     */
-    private void sortChronologically() {
-
-    }
-
-    private void sortByCategory() {
-
-    }
-
-    private void sortByCost() {
-
-    }
-
-    public String setSortingMethod(int method) {
-        String returnedText = "";
-        /*HashMap<Integer, Boolean> SORTING_METHODS = SortingRequest.getVALID_SORTING_METHODS();
-        switch (method) {
-            case SORTING_METHODS.getKey(SORTED_CHRONOLOGICALLY):
-                sortChronologically();
-                sortingMethod = SORTED_CHRONOLOGICALLY;
-            case SORTED_BY_CATEGORY:
-                sortByCategory();
-                sortingMethod = SORTED_BY_CATEGORY;
-            case SORTED_BY_COST:
-                sortByCost();
-                sortingMethod = SORTED_BY_COST;
-        }*/
-        return returnedText;
-    }
-
 }

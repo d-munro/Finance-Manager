@@ -38,25 +38,7 @@ public class Parser {
      */
     public AccountRequest generateAccountRequest(String action, String accountName) throws InvalidRequestException {
         return new AccountRequest(action, accountName);
-    }
-    
-
-    /**
-     * Generates an AccountRequest which describes the details of an account
-     *
-     * @param action The action word describing the Request
-     * @param accountId The unique identifier referring to the account
-     *
-     * @return The created AccountRequest object
-     *
-     * @throws InvalidRequestException
-     *
-     */
-    public AccountRequest generateAccountRequest(String action, int accountId) 
-            throws InvalidRequestException {
-        return new AccountRequest(action, accountId);
-    }
-    
+    }   
 
     /**
      * Generates a TransactionRequest which describes the details and modifications of a transaction
@@ -86,29 +68,15 @@ public class Parser {
      *
      * @param action The keyword describing how the user wishes to change the
      * transaction
-     * @param transactionId The unique identifier referring to the transaction
+     * @param transactionNumber The index of the transaction in the account records
      *
      * @throws InvalidRequestException
      *
      * @return New TransactionRequest object
      */
-    public TransactionRequest generateTransactionRequest(String action, int transactionId)
+    public TransactionRequest generateTransactionRequest(String action, int transactionNumber)
             throws InvalidRequestException {
-        return new TransactionRequest(action, transactionId);
-    }
-        
-    /**
-     * Generates a SortingRequest to sort transactions in various ways
-     * 
-     * @param action The action word describing the SortingRequest
-     * @param sortingMethod The method of which transactions are to be sorted
-     * 
-     * @throws InvalidRequestException
-     * 
-     * @return The SortingRequest object describing the sorting method
-     */
-    public SortingRequest generateSortingRequest(String action, int sortingMethod) throws InvalidRequestException {
-        return new SortingRequest(action, sortingMethod);
+        return new TransactionRequest(action, transactionNumber);
     }
 
     /**
@@ -120,8 +88,8 @@ public class Parser {
      * @throws InvalidRequestException
      * 
      * @return Request.ACCOUNT if action relates to an account,
-     * Request.TRANSACTION if action relates to a transaction Request.NONE if
-     * action relates to neither
+     * Request.TRANSACTION if action relates to a transaction,
+     * Request.NONE if action relates to neither
      */
     public int getActionObject(String action) throws InvalidRequestException {
         String[] words = action.split(" ");

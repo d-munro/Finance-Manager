@@ -1,6 +1,3 @@
-/*------------------------TODO---------------------------
-Implement delete and sort transaction functionality
- */
 package finance;
 
 //imports
@@ -16,7 +13,6 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 
 /**
@@ -25,9 +21,6 @@ import java.util.InputMismatchException;
  * @author Dylan Munro
  */
 public class IO {
-    
-    //When testMode is on, automatically loads accounts.json into program
-    private boolean testMode = false;
 
     private final AccountManager manager = new AccountManager();
     private final Parser parser = new Parser();
@@ -37,6 +30,7 @@ public class IO {
      *
      * @param input The Scanner reading the user's input
      * @param prompt The question to prompt the user with
+     *
      * @return A valid double
      */
     public double getDouble(Scanner input, String prompt) {
@@ -61,6 +55,7 @@ public class IO {
      *
      * @param input The Scanner reading the user's input
      * @param prompt The question to prompt the user with
+     *
      * @return A valid int
      */
     public int getInt(Scanner input, String prompt) {
@@ -81,40 +76,21 @@ public class IO {
     }
 
     /**
-     * Obtains the path from the user to the JSON file with account details
      *
-     * @param input The Scanner which input is being read from
-     * @return The path to the JSON file with account details
+     * @param input The Scanner reading the user's input
+     *
+     * @return BufferedReader with file containing account details
+     *
+     * @throws IOException
      */
-    /*private BufferedReader getAccountFilePath(Scanner input) {
-        BufferedReader fileStream = null;
-        boolean isValidFile = false;
-        while (!isValidFile) {
-            System.out.println("Enter the path to the file with the account details");
-            try {
-                fileStream = new BufferedReader(new FileReader(input.nextLine()));
-                isValidFile = true;
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-        return fileStream;
-    }*/
-    
     private BufferedReader getAccountFilePath(Scanner input) throws IOException {
         BufferedReader fileStream = null;
-        if (!testMode) {
-            System.out.println("Enter the path to the file with the account details");
-            String userResponse = input.nextLine();
-            try {
-                fileStream = new BufferedReader(new FileReader(userResponse));
-            } catch (IOException e) {
-                throw new IOException("The file \"" + userResponse + "\" could not be found");
-            }           
-        } 
-        if (testMode) {
-            //DELETE AFTER TESTING
-            return new BufferedReader(new FileReader("src/main/resources/accounts.json"));
+        System.out.println("Enter the path to the file with the account details");
+        String userResponse = input.nextLine();
+        try {
+            fileStream = new BufferedReader(new FileReader(userResponse));
+        } catch (IOException e) {
+            throw new IOException("The file \"" + userResponse + "\" could not be found");
         }
         return fileStream;
     }
@@ -129,52 +105,33 @@ public class IO {
      * @return The newly created AccountRequest object
      */
     private AccountRequest getAccountRequest(String action, Scanner input)
-            throws InvalidRequestException, AccountNotFoundException {
+            throws InvalidRequestException, AccountException {
         AccountRequest request;
         String userInput;
-        switch (action) { //Handles cases where multiple parameters are needed
+        switch (action) {
             case "add account":
                 System.out.println("Enter the name of the account:");
                 break;
             case "change account":
-                if (manager.getNumOfAccountsLoaded() == 0) {
-                    throw new AccountNotFoundException("You must load or create an account first");
+                if (manager.getNumOfAccountsLoaded() <= 1) {
+                    throw new AccountException("You must have multiple accounts"
+                            + " loaded before selecting a new one");
                 }
-                System.out.println("Enter the name of the account to change to:");
+                System.out.println("Enter the name of the account to change to "
+                        + "(case-sensitive):");
                 break;
             case "delete account":
                 if (manager.getNumOfAccountsLoaded() == 0) {
-                    throw new AccountNotFoundException("You must load or create an account first");
+                    throw new AccountException("You must load or create an account first");
                 }
-                System.out.println("Enter the name of the account to delete:");
+                System.out.println("Enter the name of the account to delete"
+                        + " (case-sensitive):");
                 break;
             default:
                 throw new InvalidRequestException("The specified action could not be found");
         }
         userInput = input.nextLine();
         request = new AccountRequest(action, userInput);
-        return request;
-    }
-
-    /**
-     * Obtains all necessary user input to create an SortingRequest object and
-     * creates it
-     *
-     * @param action The action word describing the functionality of the Request
-     * @param input The Scanner which user input is being read from
-     *
-     * @return The newly created SortingRequest object
-     */
-    private SortingRequest getSortingRequest(String action, Scanner input)
-            throws InvalidRequestException, AccountNotFoundException {
-        if (!manager.hasActiveAccount()) {
-            throw new AccountNotFoundException("Please select an account first");
-        }
-        String prompt = "Enter 1 to sort the transactions chronologically"
-                + "\nEnter 2 to sort the transactions by cost"
-                + "\nEnter 3 to sort the transactions by category";
-        int sortingMethod = getInt(input, prompt);
-        SortingRequest request = new SortingRequest(action, sortingMethod);
         return request;
     }
 
@@ -188,12 +145,12 @@ public class IO {
      * @return The newly created TransactionRequest object
      */
     private TransactionRequest getTransactionRequest(String action, Scanner input)
-            throws InvalidRequestException, AccountNotFoundException, TransactionNotFoundException {
+            throws InvalidRequestException, AccountException, TransactionNotFoundException {
         TransactionRequest request = null;
         switch (action) {
             case "add transaction":
                 if (!manager.hasActiveAccount()) {
-                    throw new AccountNotFoundException("No active account selected");
+                    throw new AccountException("No active account selected");
                 }
                 System.out.println("Enter the name of the item");
                 String itemName = input.nextLine();
@@ -209,7 +166,7 @@ public class IO {
                 break;
             case "delete transaction":
                 if (!manager.hasActiveAccount()) {
-                    throw new AccountNotFoundException("No active account selected");
+                    throw new AccountException("No active account selected");
                 }
                 printTransactions();
                 int transactionNumber = getInt(input,
@@ -227,8 +184,10 @@ public class IO {
      *
      * @param input The Scanner which input is being read from
      * @param prompt The question being asked to the user
+     * 
+     * @return The desired date to be created
      */
-    private LocalDate getDate(Scanner input, String prompt) {
+    public LocalDate getDate(Scanner input, String prompt) {
         LocalDate date = LocalDate.now();
         boolean isValid = false;
         String userInput;
@@ -248,12 +207,13 @@ public class IO {
 
     /**
      * Generates a date from a String given in the form (yyyy-mm-dd).
+     * <p>
      * Alternatively, if the String given is "today", the current date is
      * generated.
      *
      * @param str The date formatted as a string in the format (yyyy-mm-dd)
      *
-     * @throws InvalidInputException
+     * @throws ParseException
      *
      * @return A date object representing the input String
      */
@@ -269,6 +229,7 @@ public class IO {
      *
      * @param question The question being asked
      * @param input The Scanner which input is being read from
+     *
      * @return The user's response to the question (yes or no)
      */
     private String getYesOrNoResponse(String question, Scanner input) {
@@ -278,9 +239,9 @@ public class IO {
                 System.out.println(question);
                 response = input.nextLine();
                 if (!isYesOrNoResponse(response)) {
-                    throw new InvalidInputException("Please enter Yes or No");
+                    throw new IOException("Please enter Yes or No");
                 }
-            } catch (InvalidInputException e) {
+            } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -288,11 +249,9 @@ public class IO {
     }
 
     /**
-     * Returns true if the string is yes or no (Case insensitive), false
-     * otherwise
-     *
      * @param str The string being compared to yes and no
-     * @return True if the string is equal to yes or no, false otherwise
+     *
+     * @return true if the string is equal to yes or no, false otherwise
      */
     private boolean isYesOrNoResponse(String str) {
         return (str.compareToIgnoreCase("Yes") == 0
@@ -313,18 +272,6 @@ public class IO {
             }
         }
         return true;
-    }
-
-    /**
-     * Loads all preliminary data needed to execute program
-     */
-    private void load(Scanner input) {
-        try {
-            loadFiles(input);
-        } catch (IOException | CorruptJSONObjectException e) {
-            System.out.println(e.getMessage());
-        }
-
     }
 
     /**
@@ -349,19 +296,7 @@ public class IO {
      * @param input The Scanner which input is being read from
      * @throws CorruptJSONObjectException, IOException
      */
-    private void loadFiles(Scanner input) throws CorruptJSONObjectException,
-            IOException {
-        
-        //DELETE AFTER TESTING
-        if (testMode) {
-            try {
-                manager.generateAccounts(loadAccountsJSON(getAccountFilePath(input)));                
-            } catch (Exception e ) {
-                System.out.println(e.getMessage());
-            }
-            return;
-        }
-        
+    private void loadFiles(Scanner input) {
         JSONObject accountsJson;
         BufferedReader activeStream = null;
         boolean loadedValidFile = false;
@@ -374,8 +309,7 @@ public class IO {
                     accountsJson = loadAccountsJSON(activeStream);
                     manager.generateAccounts(accountsJson);
                     loadedValidFile = true;
-                } catch (CorruptJSONObjectException | InputMismatchException
-                        | AccountNotFoundException | DateTimeParseException e) {
+                } catch (Exception e) {
                     System.out.println(e.getMessage());
                     userResponse = getYesOrNoResponse(
                             "Would you like to load a different file? (Yes/No)", input);
@@ -383,8 +317,12 @@ public class IO {
                         return;
                     }
                 } finally {
-                    if (activeStream != null) {
-                        activeStream.close();
+                    try {
+                        if (activeStream != null) {
+                            activeStream.close();
+                        }
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
                     }
                 }
             }
@@ -399,7 +337,7 @@ public class IO {
     public static void main(String[] args) {
         IO ioHandler = new IO();
         Scanner input = new Scanner(System.in);
-        ioHandler.load(input);
+        ioHandler.loadFiles(input);
         ioHandler.run(input);
     }
 
@@ -407,11 +345,11 @@ public class IO {
      * Prints all transactions for the account selected in the account manager
      *
      * @throws InvalidRequestException
-     * @throws AccountNotFoundException
+     * @throws AccountException
      * @throws TransactionNotFoundException
      */
     public void printTransactions() throws InvalidRequestException,
-            AccountNotFoundException, TransactionNotFoundException {
+            AccountException, TransactionNotFoundException {
         System.out.println("Here are all transactions for the current account:");
         System.out.println(manager.executeRequest(parser.generateRequest("display transaction")));
     }
@@ -438,16 +376,13 @@ public class IO {
                     case Request.TRANSACTION:
                         currentRequest = getTransactionRequest(userChoice, input);
                         break;
-                    case Request.SORTING:
-                        currentRequest = getSortingRequest(userChoice, input);
-                        break;
                     default:
                         currentRequest = parser.generateRequest(userChoice);
                         break;
                 }
                 output = manager.executeRequest(currentRequest);
                 System.out.println(output);
-            } catch (InvalidRequestException | AccountNotFoundException | TransactionNotFoundException e) {
+            } catch (InvalidRequestException | AccountException | TransactionNotFoundException e) {
                 System.out.println(e.getMessage());
             }
         }

@@ -15,15 +15,13 @@ public class Request {
     private static final LinkedHashMap<String, String> TWO_PARAM_ACTION_DESCRIPTIONS;
     
     //Public Constants
-    public static final int NONE = 0;
-    public static final int ACCOUNT = 1;
-    public static final int TRANSACTION = 2;
-    public static final int SORTING = 3;
+    public static final int NONE = 0; //Indicates Request is not acting on an object
+    public static final int ACCOUNT = 1; //Indicates Request is modifying an account
+    public static final int TRANSACTION = 2; //Indicates Request is modifying a transaction
     
     //Class variables
-    private String action;
+    private final String action;
 
-    //Static initialization of ONE_PARAM_ACTION_DESCRIPTIONS
     static {
         ONE_PARAM_ACTION_DESCRIPTIONS = new LinkedHashMap<String, String>();
         ONE_PARAM_ACTION_DESCRIPTIONS.put("help", "display the help menu");
@@ -37,11 +35,10 @@ public class Request {
         TWO_PARAM_ACTION_DESCRIPTIONS.put("change account", "change the active account");
         TWO_PARAM_ACTION_DESCRIPTIONS.put("delete account", "delete an account");
         TWO_PARAM_ACTION_DESCRIPTIONS.put("delete transaction", "delete a transaction from the current active account");
-        //TWO_PARAM_ACTION_DESCRIPTIONS.put("sort transaction", "sort the transactions for the current active account");
     }
 
     /**
-     * Constructor
+     * Creates a Request not containing any action words
      *
      * @throws InvalidRequestException
      */
@@ -67,10 +64,12 @@ public class Request {
      
     /**
      * Creates a Request for an action that creates a Transaction
+     * <p>
+     * This constructor should only be called from subclasses of request
      *
      * @param action The keyword describing how the user wishes to change the
      * account
-     * @param isCalledFromSubclass Specifies if a subclass is calling the constructor
+     * @param isCalledFromSubclass Specifies if a subclass of Request is calling the constructor
      *
      * @throws InvalidRequestException
      */        
@@ -95,10 +94,18 @@ public class Request {
         return action;
     }
     
+    /**
+     * 
+     * @return HashMap containing all transactions valid with only an action word
+     */
     public static LinkedHashMap<String, String> getONE_PARAM_ACTION_DESCRIPTIONS() {
         return ONE_PARAM_ACTION_DESCRIPTIONS;
     }
     
+    /**
+     * 
+     * @return HashMap containing all transactions which must have an object to act upon
+     */
     public static LinkedHashMap<String, String> getTWO_PARAM_ACTION_DESCRIPTIONS() {
         return TWO_PARAM_ACTION_DESCRIPTIONS;
     }

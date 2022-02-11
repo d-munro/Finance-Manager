@@ -1,5 +1,6 @@
 package finance;
 
+//Imports
 import java.util.HashMap;
 import java.util.Set;
 import org.json.simple.JSONArray;
@@ -12,7 +13,7 @@ import org.json.simple.JSONObject;
  */
 public class AccountManager {
 
-    private HashMap<String, Account> namesToAccounts = new HashMap<String, Account>();
+    private final HashMap<String, Account> namesToAccounts = new HashMap<String, Account>();
     private Account activeAccount;
     private int numOfAccountsLoaded;
 
@@ -22,10 +23,18 @@ public class AccountManager {
      *
      * @param request Request object containing all information for account
      * creation
+     * 
      * @return Message indicating that account creation was successful
+     * 
+     * @throws AccountException
      */
-    private String executeAddAccountRequest(AccountRequest request) {
+    private String executeAddAccountRequest(AccountRequest request) 
+        throws AccountException{
         String accountName = request.getAccountName();
+        if (namesToAccounts.containsKey(accountName)) {
+            throw new AccountException("The account \"" + accountName 
+                    + "\"already exists");
+        }
         Account account = new Account(accountName);
         namesToAccounts.put(account.getName(), account);
         activeAccount = account;
@@ -35,34 +44,57 @@ public class AccountManager {
     }
     
     /**
-     * Handles execution of requests to generate new accounts
-     * @param request The request containing the necessary specifications for 
-     * account creation
+     * Handles execution of requests to add a transaction to the current active account
+     * 
+     * @param request Request object containing sufficient information to create
+     * a transaction
+     * 
      * @return A message informing the user that the request was successful
-     * @throws AccountNotFoundException 
+     * 
+     * @throws AccountException 
      */
     private String executeAddTransactionRequest(TransactionRequest request) 
-        throws AccountNotFoundException {
+        throws AccountException {
         if (activeAccount == null) {
-            throw new AccountNotFoundException("Please select an active account before making a transaciton");
+            throw new AccountException("Please select an active account before making a transaciton");
         }
         activeAccount.addTransaction(new Transaction(request.getItemName(), request.getItemFee(),
             request.getItemCategory(), request.getDate(), request.getQuantity()));
         return "The transaction has been added to the account \"" + activeAccount.getName() + "\"";
     }
-
-     /**
-     * Handles execution of requests with the action "delete account"
-     * @return Output text of the delete account request
-     * @throws AccountNotFoundException 
+    
+    /**
+     * Handles execution of requests to change the active account
+     * 
+     * @param request The request containing the details of the new active account
+     * 
+     * @return A message informing the user of the new active account
+     * 
+     * @throws AccountException
      */
-    private String executeDeleteAccountRequest(AccountRequest request) throws AccountNotFoundException {
+    private String executeChangeAccountRequest(AccountRequest request) throws AccountException {
+        String activeAccountName = request.getAccountName();
+        setActiveAccount(activeAccountName);
+        return activeAccountName + " is now the active account.";
+    }
+    
+     /**
+     * Handles execution of requests to delete accounts
+     * 
+     * @param request The request containing all necessary specifications for 
+     * account creation
+     * 
+     * @return A message informing the user that account deletion was successful
+     * 
+     * @throws AccountException 
+     */
+    private String executeDeleteAccountRequest(AccountRequest request) throws AccountException {
         StringBuilder returnedString = new StringBuilder();
         if (namesToAccounts.isEmpty()) {
-            throw new AccountNotFoundException("There are currently no accounts loaded");
+            throw new AccountException("There are currently no accounts loaded");
         }
         if (namesToAccounts.get(request.getAccountName()) == null) {
-            throw new AccountNotFoundException("The account \""
+            throw new AccountException("The account \""
                     + request.getAccountName() + "\" does not exist");
         }
         if (namesToAccounts.get(request.getAccountName()).equals(activeAccount)) {
@@ -78,11 +110,13 @@ public class AccountManager {
     }
 
     /**
-     * Handles execution of requests with the action "display account"
-     * @return Output text of the display account request
-     * @throws AccountNotFoundException 
+     * Handles execution of requests to display all presently loaded accounts
+     * 
+     * @return A list of all presently loaded accounts in the program
+     * 
+     * @throws AccountException 
      */
-    private String executeDisplayAccountRequest() throws AccountNotFoundException {
+    private String executeDisplayAccountRequest() throws AccountException {
         StringBuilder sb = new StringBuilder();
         for (String current : getAccountNames()) {
             sb.append(current).append("\n");
@@ -91,15 +125,18 @@ public class AccountManager {
     }
 
      /**
-     * Handles execution of requests with the action "display transaction"
-     * @return Output text of the display transaction request
-     * @throws AccountNotFoundException
+     * Handles execution of requests to display all transactions in the current
+     * active account. Generates a string containing details of every transaction.
+     * 
+     * @return String containing the details of every transaction on the account
+     * 
+     * @throws AccountException
      * @throws TransactionNotFoundException
      */  
     private String executeDisplayTransactionRequest() throws
-            AccountNotFoundException, TransactionNotFoundException {
+            AccountException, TransactionNotFoundException {
         if (activeAccount == null) {
-            throw new AccountNotFoundException("No active account selected");
+            throw new AccountException("No active account selected");
         } else if (!activeAccount.containsTransactions()) {
             throw new TransactionNotFoundException(
                     "No transactions have been made on the account.");
@@ -117,35 +154,30 @@ public class AccountManager {
     }
 
     /**
-     * Handles execution of requests with the action "delete transaction"
-     * @return Output text of the delete transaction request
-     * @throws AccountNotFoundException
+     * Handles execution of requests to delete a transaction from the current
+     * active account
+     * 
+     * @param request The request containing the number of the transaction to delete
+     * 
+     * @return Message informing the user that transaction deletion was successful
+     * 
+     * @throws AccountException
      * @throws TransactionNotFoundException
      */    
     private String executeDeleteTransactionRequest(TransactionRequest request) throws 
-            AccountNotFoundException, TransactionNotFoundException {
+            AccountException, TransactionNotFoundException {
         int transactionNumber = request.getTransactionNumber();
         if (activeAccount == null) {
-            throw new AccountNotFoundException("No active account selected");
+            throw new AccountException("No active account selected");
         } 
         activeAccount.deleteTransaction(transactionNumber);
-        return "The transaction associated with the id \"" + transactionNumber
-                + "\" has been deleted";
-    }
-    
-    /**
-     * Handles execution of requests with the action "change account"
-     * @return Output text of the change account request
-     */
-    private String executeChangeRequest(AccountRequest request) throws AccountNotFoundException {
-        String activeAccountName = request.getAccountName();
-        setActiveAccount(activeAccountName);
-        return activeAccountName + " is now the active account.";
+        return "Transaction number \"" + transactionNumber + "\" has been deleted";
     }
 
     /**
-     * Handles execution of requests with the action "quit"
-     * @return Output text of the quit request
+     * Handles execution of requests to quit the program
+     * 
+     * @return A message thanking the user for using the program
      */
     private String executeQuitRequest() {
         return "Thank you for using Finance Manager!";
@@ -153,14 +185,17 @@ public class AccountManager {
 
     /**
      * Manages execution of a request object to modify an account
-     * @param request The request to be executed
+     * 
+     * @param request Request to be executed
+     * 
      * @return Output text of the request
-     * @throws AccountNotFoundException
+     * 
+     * @throws AccountException
      * @throws InvalidRequestException
      * @throws TransactionNotFoundException 
      */
     public String executeRequest(Request request)
-            throws AccountNotFoundException, InvalidRequestException, TransactionNotFoundException {
+            throws AccountException, InvalidRequestException, TransactionNotFoundException {
         String output = "";
         switch (request.getAction()) {
             case "add account":
@@ -169,8 +204,8 @@ public class AccountManager {
             case "add transaction":
                 output = executeAddTransactionRequest((TransactionRequest)request);
                 break;
-            case "change":
-                output = executeChangeRequest((AccountRequest)request);
+            case "change account":
+                output = executeChangeAccountRequest((AccountRequest)request);
                 break;
             case "delete account":
                 output = executeDeleteAccountRequest((AccountRequest)request);
@@ -190,24 +225,11 @@ public class AccountManager {
             case "quit":
                 output = executeQuitRequest();
                 break;
-            case "sort":
-                output = executeSortRequest((SortingRequest)request);
-                break;
             default:
-                throw new InvalidRequestException("Request \"" + request.getAction()
+                throw new InvalidRequestException("The request \"" + request.getAction()
                         + "\" is not recognized");
         }
         return output;
-    }
-
-    /**
-     * Handles execution of requests specifying to sort accounts
-     * @param request The object containing details about the method of sorting
-     * @return Output text of the sort request
-     * @throws InvalidRequestException 
-     */
-    private String executeSortRequest(SortingRequest request) throws InvalidRequestException {
-        return activeAccount.setSortingMethod(request.getSortingMethod());
     }
 
     /**
@@ -215,10 +237,10 @@ public class AccountManager {
      *
      * @param obj JSONObject containing details necessary for account creation
      * @throws CorruptJSONObjectException
-     * @throws AccountNotFoundException
+     * @throws AccountException
      */
     public void generateAccounts(JSONObject obj) throws
-            CorruptJSONObjectException, AccountNotFoundException {
+            CorruptJSONObjectException, AccountException {
         Account currentAccount;
         JSONArray accountsArray;
         try {
@@ -228,6 +250,7 @@ public class AccountManager {
         }
         for (int i = 0; i < accountsArray.size(); i++) {
             currentAccount = new Account((JSONObject) accountsArray.get(i));
+            numOfAccountsLoaded++;
             namesToAccounts.put(currentAccount.getName(), currentAccount);
             if (accountsArray.size() == 1) {
                 setActiveAccount(currentAccount.getName());
@@ -238,37 +261,37 @@ public class AccountManager {
     /**
      * 
      * @return Set containing all account names loaded in the account manager
-     * @throws AccountNotFoundException 
+     * @throws AccountException 
      */
-    public Set<String> getAccountNames() throws AccountNotFoundException {
+    public Set<String> getAccountNames() throws AccountException {
         if (namesToAccounts.isEmpty()) {
-            throw new AccountNotFoundException("No accounts are currently loaded");
+            throw new AccountException("No accounts are currently loaded");
         }
         return namesToAccounts.keySet();
     }
 
     /**
      *
-     * @return Name of the active account if not null. If activeAccount is null,
-     * throws AccountNotFoundException
-     * @throws AccountNotFoundException
+     * @return Name of the active account
+     * 
+     * @throws AccountException
      */
-    public String getActiveAccountName() throws AccountNotFoundException {
+    public String getActiveAccountName() throws AccountException {
         if (activeAccount == null) {
-            throw new AccountNotFoundException("No account is currently selected");
+            throw new AccountException("No account is currently selected");
         }
         return activeAccount.getName();
     }
     
     /**
-     * @return The number of accounts currently loaded in the account manager
+     * 
+     * @return Number of accounts currently loaded in the account manager
      */
     public int getNumOfAccountsLoaded() {
         return numOfAccountsLoaded;
     }
 
     /**
-     *
      *
      * @return A list of useful commands for executing the program
      */
@@ -287,7 +310,7 @@ public class AccountManager {
     
     /**
      * 
-     * @return true if there is currently an active account in the account manager, 
+     * @return true if there is currently an active account in the account manager,
      * false otherwise
      */
     public boolean hasActiveAccount() {
@@ -296,12 +319,14 @@ public class AccountManager {
 
     /**
      * Changes the active account in the account manager
+     * 
      * @param accountName The name of the account becoming the active account
-     * @throws AccountNotFoundException 
+     * 
+     * @throws AccountException 
      */
-    private void setActiveAccount(String accountName) throws AccountNotFoundException {
+    private void setActiveAccount(String accountName) throws AccountException {
         if (!namesToAccounts.containsKey(accountName)) {
-            throw new AccountNotFoundException("The account " + accountName
+            throw new AccountException("The account " + accountName
                     + " is not recognized");
         }
         activeAccount = namesToAccounts.get(accountName);
